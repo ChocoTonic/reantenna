@@ -205,11 +205,11 @@ final class AppModel: ObservableObject {
     }
 
     private enum DefaultsKey {
-        static let preferences = "threadline.preferences"
-        static let browser = "threadline.browser"
-        static let pagination = "threadline.pagination"
-        static let cellularLimit = "threadline.cellular-download-limit-mb"
-        static let imageCacheLimit = "threadline.image-cache-limit-mb"
-        static let history = "threadline.recently-viewed-post-ids"
+        static let preferences = "reantenna.preferences"
+        static let browser = "reantenna.browser"
+        static let pagination = "reantenna.pagination"
+        static let cellularLimit = "reantenna.cellular-download-limit-mb"
+        static let imageCacheLimit = "reantenna.image-cache-limit-mb"
+        static let history = "reantenna.recently-viewed-post-ids"
     }
 }

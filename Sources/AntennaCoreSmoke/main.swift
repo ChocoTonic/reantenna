@@ -23,8 +23,8 @@ struct AntennaCoreSmoke {
 
         let configuration = RedditAPIConfiguration(
             clientID: "approved-client-id",
-            redirectURI: "threadline://oauth",
-            userAgent: "ios:com.example.threadline:v0.1 (by /u/example)"
+            redirectURI: "reantenna://oauth",
+            userAgent: "ios:com.example.reantenna:v0.1 (by /u/example)"
         )
         precondition(configuration.isUsable)
 

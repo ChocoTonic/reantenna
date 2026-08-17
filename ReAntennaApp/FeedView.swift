@@ -50,7 +50,7 @@ struct FeedView: View {
                 feed
             }
         }
-        .background(Color.threadlineBackground)
+        .background(Color.reAntennaBackground)
     }
 
     @ViewBuilder
@@ -134,7 +134,7 @@ private struct DensePostRow: View {
         ZStack(alignment: .trailing) {
             actionStrip
             rowContent
-                .background(Color.threadlineBackground)
+                .background(Color.reAntennaBackground)
                 .offset(x: (isActionsOpen ? -actionsWidth : 0) + dragOffset)
                 .contentShape(Rectangle())
                 .onTapGesture {

@@ -41,7 +41,7 @@ struct SwipeMenuView: View {
             }
             .padding(.bottom, 18)
         }
-        .background(Color.threadlineSecondaryBackground)
+        .background(Color.reAntennaSecondaryBackground)
         .overlay(alignment: .leading) {
             Rectangle().fill(AppTheme.separator).frame(width: 0.5)
         }
@@ -62,7 +62,7 @@ struct SwipeMenuView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 10)
                 .frame(height: 20)
-                .background(Color.threadlineTertiaryBackground)
+                .background(Color.reAntennaTertiaryBackground)
                 .overlay(alignment: .bottom) {
                     Rectangle().fill(AppTheme.separator).frame(height: 0.5)
                 }

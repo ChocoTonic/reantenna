@@ -104,7 +104,7 @@ struct SettingsView: View {
                 }
 
                 Section("About") {
-                    LabeledContent("Threadline", value: "Milestone 1")
+                    LabeledContent("ReAntenna", value: "Milestone 1")
                     Text("An independently written, gesture-first Reddit reader inspired by compact native clients.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -112,7 +112,7 @@ struct SettingsView: View {
             }
         }
         .alert(
-            "Threadline",
+            "ReAntenna",
             isPresented: Binding(
                 get: { confirmationMessage != nil },
                 set: { if !$0 { confirmationMessage = nil } }

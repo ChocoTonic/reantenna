@@ -2,7 +2,7 @@ import SwiftUI
 import AntennaCore
 
 @main
-struct ThreadlineApp: App {
+struct ReAntennaApp: App {
     @StateObject private var model = AppModel(service: FixtureRedditService())
 
     var body: some Scene {

@@ -5,7 +5,7 @@
 - Git tags preserve every released source version indefinitely.
 - CI validates every pull request and `main` push without signing.
 - Each `main` push stores a simulator snapshot for 30 days; the workflow also
-  deletes all but the newest three Threadline snapshots.
+  deletes all but the newest three ReAntenna snapshots.
 - A historical tag, branch, or commit can be rebuilt at any time by manually
   running **Simulator snapshot** and entering that ref.
 - Failed XCTest result bundles are diagnostic-only and expire after three days.
@@ -36,7 +36,7 @@ Program team and these GitHub Actions secrets:
 | `APPLE_PROVISIONING_PROFILE_BASE64` | Base64-encoded matching profile |
 | `APPLE_KEYCHAIN_PASSWORD` | Random temporary CI keychain password |
 | `APPLE_TEAM_ID` | Apple developer team identifier |
-| `APPLE_BUNDLE_ID` | Registered Threadline bundle identifier |
+| `APPLE_BUNDLE_ID` | Registered ReAntenna bundle identifier |
 
 Run **Signed device build**, select a source ref, and choose the export method that
 matches the profile. Debugging and release-testing IPAs only install on devices

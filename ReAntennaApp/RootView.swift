@@ -8,7 +8,7 @@ struct RootView: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .trailing) {
-                Color.threadlineBackground.ignoresSafeArea()
+                Color.reAntennaBackground.ignoresSafeArea()
 
                 SwipeMenuView()
                     .frame(width: min(proxy.size.width * 0.84, 390))
@@ -17,7 +17,7 @@ struct RootView: View {
 
                 navigationContent
                     .frame(width: proxy.size.width, height: proxy.size.height)
-                    .background(Color.threadlineBackground)
+                    .background(Color.reAntennaBackground)
                     .offset(x: contentOffset(for: proxy.size.width))
                     .shadow(
                         color: .black.opacity(model.isMenuOpen ? 0.28 : 0),
@@ -42,18 +42,18 @@ struct RootView: View {
     private var navigationContent: some View {
         NavigationStack(path: $model.path) {
             FeedView()
-                .threadlineNavigationChromeHidden()
+                .reAntennaNavigationChromeHidden()
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case let .post(id):
                         PostDetailView(postID: id)
-                            .threadlineNavigationChromeHidden()
+                            .reAntennaNavigationChromeHidden()
                     case .settings:
                         SettingsView()
-                            .threadlineNavigationChromeHidden()
+                            .reAntennaNavigationChromeHidden()
                     case let .listing(title):
                         PlaceholderListingView(title: title)
-                            .threadlineNavigationChromeHidden()
+                            .reAntennaNavigationChromeHidden()
                     }
                 }
         }

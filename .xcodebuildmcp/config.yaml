@@ -1,7 +1,7 @@
 schemaVersion: 1
 sessionDefaults:
-  projectPath: Threadline.xcodeproj
-  scheme: Threadline
+  projectPath: ReAntenna.xcodeproj
+  scheme: ReAntenna
   configuration: Debug
   simulatorName: iPhone 17 Pro
   useLatestOS: true

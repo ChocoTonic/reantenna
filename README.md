@@ -1,6 +1,8 @@
-# Threadline
+# ReAntenna
 
-Threadline is an independently written, gesture-first iPhone/iPad discussion client inspired by the speed and information density of Antenna/AMRC. It currently runs entirely against deterministic fixture data, so the complete interaction layer can be developed without using unapproved Reddit access.
+ReAntenna is an unofficial, open-source reimplementation inspired by the discontinued Antenna (formerly AMRC) Reddit client. It is not affiliated with or endorsed by the original Antenna developer.
+
+The project is independently written and uses original assets. It recreates Antenna's gesture-first speed and information density without copying the original source code, icon, artwork, or proprietary resources. It currently runs entirely against deterministic fixture data, so the interaction layer can be developed without using unapproved Reddit access.
 
 ## Implemented milestone
 
@@ -26,22 +28,22 @@ Threadline is an independently written, gesture-first iPhone/iPad discussion cli
 
 ## Open the project
 
-The generated Xcode project is [Threadline.xcodeproj](Threadline.xcodeproj). `project.yml` is its source of truth.
+The generated Xcode project is [ReAntenna.xcodeproj](ReAntenna.xcodeproj). `project.yml` is its source of truth.
 
 After installing full Xcode:
 
 ```sh
-cd /Users/asdf/repos/General/AntennaRebuild
+cd /Users/asdf/repos/reantenna
 xcodegen generate
-open Threadline.xcodeproj
+open ReAntenna.xcodeproj
 ```
 
 In Xcode:
 
-1. Select the `Threadline` target.
+1. Select the `ReAntenna` target.
 2. Open **Signing & Capabilities**.
 3. Select your Apple Account's **Personal Team**.
-4. Replace `com.example.threadline.app` with a unique bundle identifier if Xcode requests it.
+4. Replace `com.example.reantenna.app` with a unique bundle identifier if Xcode requests it.
 5. Connect the iPhone, enable Developer Mode, choose it as the run destination, and press Run.
 
 A free Personal Team build expires after seven days and then needs to be rebuilt/reinstalled.
@@ -82,7 +84,7 @@ No view knows whether its content came from fixtures, Reddit's Data API, or a fu
 
 ## What works today
 
-Threadline is currently an interaction prototype, not yet a live Reddit client. The feed,
+ReAntenna is currently an interaction prototype, not yet a live Reddit client. The feed,
 sorting, layouts, swipe navigation, appearance preferences, thread traversal, and comment
 collapse controls operate against deterministic fixtures. In particular, **Collapse
 Children** keeps every root comment visible while hiding all of its descendants, matching
@@ -100,7 +102,7 @@ behavioral references; the old iMazing backup supplies model and preference name
 ## Project map
 
 ```text
-AntennaApp/                 SwiftUI application and interactions
+ReAntennaApp/               SwiftUI application and interactions
 Sources/AntennaCore/       Models, traversal, service protocol, fixtures
 Sources/AntennaCoreSmoke/  Framework-free executable validation
 Tests/AntennaCoreTests/     XCTest coverage

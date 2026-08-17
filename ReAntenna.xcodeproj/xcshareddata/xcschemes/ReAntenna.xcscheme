@@ -15,10 +15,10 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8BA958CDDCA9DDFAF84B9CD7"
+               BlueprintIdentifier = "CD07DC2D404B29B9C189E593"
                BuildableName = "AntennaCoreTests.xctest"
                BlueprintName = "AntennaCoreTests"
-               ReferencedContainer = "container:Threadline.xcodeproj">
+               ReferencedContainer = "container:ReAntenna.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -29,10 +29,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A03CA947F241492090B196BB"
-               BuildableName = "Threadline.app"
-               BlueprintName = "Threadline"
-               ReferencedContainer = "container:Threadline.xcodeproj">
+               BlueprintIdentifier = "A775D5B69C381399B39A652D"
+               BuildableName = "ReAntenna.app"
+               BlueprintName = "ReAntenna"
+               ReferencedContainer = "container:ReAntenna.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,10 +46,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A03CA947F241492090B196BB"
-            BuildableName = "Threadline.app"
-            BlueprintName = "Threadline"
-            ReferencedContainer = "container:Threadline.xcodeproj">
+            BlueprintIdentifier = "A775D5B69C381399B39A652D"
+            BuildableName = "ReAntenna.app"
+            BlueprintName = "ReAntenna"
+            ReferencedContainer = "container:ReAntenna.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -58,10 +58,10 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8BA958CDDCA9DDFAF84B9CD7"
+               BlueprintIdentifier = "CD07DC2D404B29B9C189E593"
                BuildableName = "AntennaCoreTests.xctest"
                BlueprintName = "AntennaCoreTests"
-               ReferencedContainer = "container:Threadline.xcodeproj">
+               ReferencedContainer = "container:ReAntenna.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -82,10 +82,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A03CA947F241492090B196BB"
-            BuildableName = "Threadline.app"
-            BlueprintName = "Threadline"
-            ReferencedContainer = "container:Threadline.xcodeproj">
+            BlueprintIdentifier = "A775D5B69C381399B39A652D"
+            BuildableName = "ReAntenna.app"
+            BlueprintName = "ReAntenna"
+            ReferencedContainer = "container:ReAntenna.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -99,10 +99,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A03CA947F241492090B196BB"
-            BuildableName = "Threadline.app"
-            BlueprintName = "Threadline"
-            ReferencedContainer = "container:Threadline.xcodeproj">
+            BlueprintIdentifier = "A775D5B69C381399B39A652D"
+            BuildableName = "ReAntenna.app"
+            BlueprintName = "ReAntenna"
+            ReferencedContainer = "container:ReAntenna.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

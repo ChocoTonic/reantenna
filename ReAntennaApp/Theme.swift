@@ -65,7 +65,7 @@ extension Int {
 }
 
 extension Color {
-    static var threadlineBackground: Color {
+    static var reAntennaBackground: Color {
 #if os(iOS)
         Color(uiColor: UIColor { traits in
             traits.userInterfaceStyle == .dark
@@ -77,18 +77,18 @@ extension Color {
 #endif
     }
 
-    static var threadlineSecondaryBackground: Color {
+    static var reAntennaSecondaryBackground: Color {
         AppTheme.secondaryBackground
     }
 
-    static var threadlineTertiaryBackground: Color {
+    static var reAntennaTertiaryBackground: Color {
         AppTheme.sectionBackground
     }
 }
 
 extension View {
     @ViewBuilder
-    func threadlineNavigationChromeHidden() -> some View {
+    func reAntennaNavigationChromeHidden() -> some View {
 #if os(iOS)
         toolbar(.hidden, for: .navigationBar)
 #else
