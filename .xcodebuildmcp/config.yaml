@@ -1,0 +1,8 @@
+schemaVersion: 1
+sessionDefaults:
+  projectPath: Threadline.xcodeproj
+  scheme: Threadline
+  configuration: Debug
+  simulatorName: iPhone 17 Pro
+  useLatestOS: true
+  simulatorPlatform: iOS Simulator

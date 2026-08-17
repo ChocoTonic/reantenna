@@ -1,0 +1,117 @@
+import SwiftUI
+import AntennaCore
+
+struct SwipeMenuView: View {
+    @EnvironmentObject private var model: AppModel
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                menuSection("Shortcuts") {
+                    row("Add new", icon: "plus") { model.selectRoute(.listing("Add Shortcut")) }
+                    row("Edit", icon: "pencil") { model.selectRoute(.listing("Edit Shortcuts")) }
+                    row("Front · Hot", icon: "bolt") { model.closeMenu() }
+                }
+
+                menuSection("General") {
+                    row("Search", icon: "magnifyingglass") { model.selectRoute(.listing("Search")) }
+                    row("Messages", icon: "envelope") { model.selectRoute(.listing("Messages")) }
+                    row("Saved", icon: "tray.and.arrow.down") { model.selectRoute(.listing("Saved")) }
+                    row("Overview", icon: "list.bullet.rectangle") { model.selectRoute(.listing("Overview")) }
+                    row("/r  Subreddit", icon: "textformat") { model.selectRoute(.listing("Go to Subreddit")) }
+                    row("/u  User", icon: "person") { model.selectRoute(.listing("Go to User")) }
+                    row("Night mode", icon: "moon") { toggleNightMode() }
+                    row("Home", icon: "house") { goHome() }
+                    row("Settings", icon: "gearshape") { model.selectRoute(.settings) }
+                    row("Back", icon: "chevron.backward") { goBack() }
+                }
+
+                menuSection("Accounts") {
+                    ForEach(model.accounts) { account in
+                        row(account.username, icon: "person.crop.circle", accessory: "checkmark") {
+                            model.closeMenu()
+                        }
+                    }
+                }
+
+                menuSection("User") {
+                    row("Profile", icon: "person.text.rectangle") { model.selectRoute(.listing("Profile")) }
+                    row("Login another account", icon: "person.badge.plus") { model.selectRoute(.listing("Login")) }
+                }
+            }
+            .padding(.bottom, 24)
+        }
+        .background(Color.threadlineSecondaryBackground)
+        .overlay(alignment: .leading) {
+            Rectangle().fill(AppTheme.separator).frame(width: 0.5)
+        }
+    }
+
+    @ViewBuilder
+    private func menuSection<Content: View>(
+        _ title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        Section {
+            content()
+        } header: {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .frame(height: 25)
+                .background(Color.threadlineTertiaryBackground)
+                .overlay(alignment: .bottom) {
+                    Rectangle().fill(AppTheme.separator).frame(height: 0.5)
+                }
+        }
+    }
+
+    private func row(
+        _ title: String,
+        icon: String,
+        accessory: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundStyle(AppTheme.mutedBlue)
+                    .frame(width: 20)
+                Text(title)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.primary)
+                Spacer()
+                if let accessory {
+                    Image(systemName: accessory)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(AppTheme.mutedBlue)
+                }
+            }
+            .padding(.horizontal, 12)
+            .frame(height: 39)
+            .contentShape(Rectangle())
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(AppTheme.separator).frame(height: 0.5)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func toggleNightMode() {
+        model.preferences.theme = model.preferences.theme == .night ? .day : .night
+    }
+
+    private func goHome() {
+        model.path.removeAll()
+        model.closeMenu()
+    }
+
+    private func goBack() {
+        model.goBack()
+        model.closeMenu()
+    }
+}
