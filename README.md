@@ -66,6 +66,10 @@ branch, or commit SHA for historical rebuilds.
 See [docs/RELEASING.md](docs/RELEASING.md) for the retention policy, free Personal
 Team limitation, and optional signed-build secrets.
 
+For the current project status, owner prerequisites, Reddit approval checklist, and
+the checkpoint-by-checkpoint iOS 18 SideStore setup, see
+[docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
+
 ## Reddit integration
 
 Do not put old Antenna credentials, tokens, cookies, or client identifiers into this project. Live integration requires separately approved Reddit Data API credentials. Until then, `FixtureRedditService` is the active transport.
