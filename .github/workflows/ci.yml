@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: threadline-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Record toolchain
+        run: xcodebuild -version
+
+      - name: Build and test
+        run: |
+          xcodebuild \
+            -project Threadline.xcodeproj \
+            -scheme Threadline \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
+            -derivedDataPath DerivedData \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+
+      - name: Preserve failed test results
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-results-${{ github.run_id }}
+          path: TestResults.xcresult
+          retention-days: 3

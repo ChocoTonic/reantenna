@@ -10,7 +10,8 @@ struct FeedView: View {
                 HStack(spacing: 2) {
                     Button(action: cycleLayout) {
                         Image(systemName: layoutIcon)
-                            .frame(width: 30, height: 28)
+                            .font(.system(size: 12))
+                            .frame(width: 25, height: 27)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Change feed layout")
@@ -21,14 +22,15 @@ struct FeedView: View {
                         }
                     } label: {
                         Text(model.sort.rawValue)
-                            .font(.system(size: 12))
-                            .frame(minWidth: 40, minHeight: 28)
+                            .font(.system(size: 10.5))
+                            .frame(minWidth: 34, minHeight: 27)
                     }
                     .buttonStyle(.plain)
 
                     Button(action: model.toggleMenu) {
                         Image(systemName: "sidebar.right")
-                            .frame(width: 30, height: 28)
+                            .font(.system(size: 12))
+                            .frame(width: 25, height: 27)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open swipe menu")
@@ -48,6 +50,7 @@ struct FeedView: View {
                 feed
             }
         }
+        .background(Color.threadlineBackground)
     }
 
     @ViewBuilder
@@ -146,7 +149,7 @@ private struct DensePostRow: View {
         }
         .clipped()
         .overlay(alignment: .bottom) {
-            Rectangle().fill(AppTheme.separator).frame(height: 0.5)
+            Rectangle().fill(AppTheme.separator).frame(height: 1 / 3)
         }
         .accessibilityElement(children: .combine)
         .accessibilityAction(named: "Open") { open() }
@@ -154,50 +157,54 @@ private struct DensePostRow: View {
     }
 
     private var rowContent: some View {
-        HStack(alignment: .top, spacing: 7) {
+        HStack(alignment: .top, spacing: 6) {
             if layout == .thumbnail {
-                PostThumbnail(kind: post.kind, size: 58)
+                PostThumbnail(kind: post.kind, size: 50)
             } else {
-                PostThumbnail(kind: post.kind, size: 39)
+                PostThumbnail(kind: post.kind, size: 30)
             }
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 5) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(post.title)
-                        .font(.system(size: 13 * textScale, weight: .regular))
-                        .foregroundStyle(post.isRead ? .secondary : .primary)
+                        .font(.system(size: 12 * textScale, weight: .regular))
+                        .foregroundStyle(post.isRead ? AppTheme.visitedTitle : AppTheme.title)
                         .lineLimit(layout == .compact ? 2 : 3)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     if let flair = post.flair {
                         Text(flair)
-                            .font(.system(size: 8, weight: .medium))
+                            .font(.system(size: 7.5, weight: .semibold))
                             .foregroundStyle(AppTheme.purple)
                             .lineLimit(1)
                     }
                 }
 
-                HStack(spacing: 5) {
-                    Label(post.score.abbreviated, systemImage: "arrow.up")
-                        .foregroundStyle(post.vote == .up ? AppTheme.orange : .secondary)
-                    Label(post.commentCount.abbreviated, systemImage: "bubble.left")
+                HStack(spacing: 4) {
+                    Text(post.score.abbreviated)
+                        .foregroundStyle(post.vote == .up ? AppTheme.orange : AppTheme.metadata)
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 6.5, weight: .bold))
+                        .foregroundStyle(post.vote == .up ? AppTheme.orange : AppTheme.faintMetadata)
+                    Text("\(post.commentCount.abbreviated)c")
+                    Text("·")
                     Text(post.domain)
                     if post.isSaved { Image(systemName: "bookmark.fill") }
                     if post.isNSFW { Text("NSFW").foregroundStyle(.red) }
                 }
-                .font(.system(size: 9.5 * textScale))
-                .foregroundStyle(.secondary)
+                .font(.system(size: 8.5 * textScale))
+                .foregroundStyle(AppTheme.metadata)
                 .lineLimit(1)
 
                 Text("\(post.age) by \(post.author) · r/\(post.subreddit)")
-                    .font(.system(size: 8.5 * textScale))
-                    .foregroundStyle(.tertiary)
+                    .font(.system(size: 7.8 * textScale))
+                    .foregroundStyle(AppTheme.faintMetadata)
                     .lineLimit(1)
             }
-            .padding(.vertical, 5)
+            .padding(.vertical, 3)
         }
-        .padding(.horizontal, 6)
-        .frame(minHeight: layout == .thumbnail ? 70 : 54)
+        .padding(.horizontal, 5)
+        .frame(minHeight: layout == .thumbnail ? 58 : 43)
     }
 
     private var actionStrip: some View {
@@ -273,30 +280,23 @@ struct PostThumbnail: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: colors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            AppTheme.secondaryBackground
             Image(systemName: kind.systemImage)
-                .font(.system(size: size * 0.32, weight: .medium))
-                .foregroundStyle(.white.opacity(0.92))
+                .font(.system(size: size * 0.30, weight: .regular))
+                .foregroundStyle(iconColor)
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: 2))
         .overlay {
-            RoundedRectangle(cornerRadius: 2)
-                .stroke(.white.opacity(0.14), lineWidth: 0.5)
+            Rectangle().stroke(AppTheme.separator, lineWidth: 1 / 3)
         }
     }
 
-    private var colors: [Color] {
+    private var iconColor: Color {
         switch kind {
-        case .image: [.indigo, .purple]
-        case .video: [.orange, .red]
-        case .link: [.blue, .cyan]
-        case .text: [.gray, .secondary]
-        case .gallery: [.teal, .indigo]
+        case .image, .gallery: AppTheme.purple
+        case .video: AppTheme.orange
+        case .link: AppTheme.mutedBlue
+        case .text: AppTheme.metadata
         }
     }
 }

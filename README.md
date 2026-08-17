@@ -54,6 +54,16 @@ swift run AntennaCoreSmoke
 
 The normal `AntennaCoreTests` XCTest target is included, but Apple's standalone Command Line Tools installation does not currently contain XCTest. Run it from Xcode after the full installation is complete.
 
+## Continuous integration and builds
+
+GitHub Actions builds and tests the app on a pinned macOS runner. Main-branch
+simulator snapshots retain only the newest three artifacts, while Git tags retain
+the source needed to rebuild any older version. A manual workflow accepts any tag,
+branch, or commit SHA for historical rebuilds.
+
+See [docs/RELEASING.md](docs/RELEASING.md) for the retention policy, free Personal
+Team limitation, and optional signed-build secrets.
+
 ## Reddit integration
 
 Do not put old Antenna credentials, tokens, cookies, or client identifiers into this project. Live integration requires separately approved Reddit Data API credentials. Until then, `FixtureRedditService` is the active transport.
@@ -69,6 +79,23 @@ public protocol RedditService: Sendable {
 ```
 
 No view knows whether its content came from fixtures, Reddit's Data API, or a future approved Reddit platform adapter.
+
+## What works today
+
+Threadline is currently an interaction prototype, not yet a live Reddit client. The feed,
+sorting, layouts, swipe navigation, appearance preferences, thread traversal, and comment
+collapse controls operate against deterministic fixtures. In particular, **Collapse
+Children** keeps every root comment visible while hiding all of its descendants, matching
+the Antenna workflow this reconstruction is intended to preserve.
+
+Actions that require an authenticated Reddit account—voting, replying, saving remotely,
+inbox, profile, and submission—must remain unavailable until a separately registered and
+approved OAuth client is connected. The UI should never imply that one of those actions
+succeeded merely because fixture state changed.
+
+The implementation status and historical evidence are tracked in `RESEARCH.md`. Surviving
+screenshots and the developer-maintained Antenna FAQ are treated as the visual and
+behavioral references; the old iMazing backup supplies model and preference names only.
 
 ## Project map
 

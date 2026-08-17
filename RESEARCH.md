@@ -139,6 +139,33 @@ Visual references:
 - [iPhone feed and post view](https://thesweetsetup.com/wp-content/uploads/2016/03/antenna-iphone-01.jpg)
 - [iPhone X dense feed](https://superphen.wordpress.com/wp-content/uploads/2017/12/iphonex-anttena-reddit1-copy.jpg?w=1000)
 - [iPhone X grid, swipe menu, and settings](https://superphen.wordpress.com/wp-content/uploads/2017/12/iphonex-antenna-reddit.jpg?w=1000)
+- [Developer-maintained Antenna FAQ](https://www.reddit.com/r/Antenna/wiki/faq/)
+
+The FAQ is the strongest recovered behavioral reference. It documents the original
+privacy/history controls, passcode interval and Touch ID options, four post-listing modes,
+pagination and quick-press preferences, comment tap/long-press/sort/limit/collapse
+settings, ambient-light automatic night mode, cellular download limits, cache controls,
+link preview behavior, and browser selection. Screenshot-derived styling should be kept
+separate from these behavior claims so uncertain visual guesses remain easy to revise.
+
+## Implementation truth table
+
+This table describes the fixture milestone, not the eventual product:
+
+| Capability | Current state |
+|---|---|
+| Day/night/system theme | Local and persistent |
+| Dense/thumbnail/grid listing | Local and functional |
+| Feed sort | Functional over fixtures |
+| Global menu/back swipes | Functional |
+| Tap branch collapse | Functional |
+| Collapse all child comments | Functional; roots remain visible |
+| Expand all / root navigation | Functional |
+| Browser, cache, and history controls | Local preference/storage behavior only |
+| Voting, save, reply, inbox, profile | Requires approved OAuth service |
+| Search and subreddit loading | Requires live service implementation |
+| Media host integrations | Placeholder/fixture presentation |
+| Face ID/passcode | Not yet an application lock |
 
 ## Confirmed feature inventory
 

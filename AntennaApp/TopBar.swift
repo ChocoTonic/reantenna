@@ -8,29 +8,30 @@ struct TopBar<Trailing: View>: View {
     @EnvironmentObject private var model: AppModel
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 3) {
             if showsBack {
                 Button(action: model.goBack) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .semibold))
-                        .frame(width: 26, height: 28)
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 22, height: 27)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Back")
             }
 
             Text(title)
-                .font(.system(size: 15, weight: .medium))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(AppTheme.title)
                 .lineLimit(1)
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 4)
             trailing()
         }
-        .padding(.horizontal, 8)
-        .frame(height: 34)
-        .background(.bar)
+        .padding(.horizontal, 6)
+        .frame(height: 29)
+        .background(AppTheme.toolbarBackground)
         .overlay(alignment: .bottom) {
-            Rectangle().fill(AppTheme.separator).frame(height: 0.5)
+            Rectangle().fill(AppTheme.separator).frame(height: 1 / 3)
         }
     }
 }

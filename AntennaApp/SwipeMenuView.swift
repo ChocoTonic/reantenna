@@ -39,7 +39,7 @@ struct SwipeMenuView: View {
                     row("Login another account", icon: "person.badge.plus") { model.selectRoute(.listing("Login")) }
                 }
             }
-            .padding(.bottom, 24)
+            .padding(.bottom, 18)
         }
         .background(Color.threadlineSecondaryBackground)
         .overlay(alignment: .leading) {
@@ -56,12 +56,12 @@ struct SwipeMenuView: View {
             content()
         } header: {
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(AppTheme.metadata)
                 .textCase(.uppercase)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .frame(height: 25)
+                .padding(.horizontal, 10)
+                .frame(height: 20)
                 .background(Color.threadlineTertiaryBackground)
                 .overlay(alignment: .bottom) {
                     Rectangle().fill(AppTheme.separator).frame(height: 0.5)
@@ -76,23 +76,23 @@ struct SwipeMenuView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 10) {
+            HStack(spacing: 7) {
                 Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundStyle(AppTheme.mutedBlue)
-                    .frame(width: 20)
+                    .font(.system(size: 11))
+                    .foregroundStyle(AppTheme.metadata)
+                    .frame(width: 17)
                 Text(title)
-                    .font(.system(size: 15))
+                    .font(.system(size: 13))
                     .foregroundStyle(.primary)
                 Spacer()
                 if let accessory {
                     Image(systemName: accessory)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(AppTheme.mutedBlue)
                 }
             }
-            .padding(.horizontal, 12)
-            .frame(height: 39)
+            .padding(.horizontal, 10)
+            .frame(height: 33)
             .contentShape(Rectangle())
             .overlay(alignment: .bottom) {
                 Rectangle().fill(AppTheme.separator).frame(height: 0.5)
