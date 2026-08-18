@@ -17,6 +17,7 @@ enum PaginationPreference: String, CaseIterable {
 enum AppRoute: Hashable {
     case post(String)
     case settings
+    case redditAccount
     case listing(String)
 }
 
@@ -30,6 +31,9 @@ final class AppModel: ObservableObject {
     @Published var sort: FeedSort = .hot
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published private(set) var redditConnectionState: RedditConnectionState = .fixture
+    @Published private(set) var redditConnectionError: String?
+    @Published private(set) var isAuthenticatingReddit = false
     @Published var preferences: AppPreferences {
         didSet { savePreferences() }
     }
@@ -50,10 +54,17 @@ final class AppModel: ObservableObject {
     }
     @Published private(set) var recentlyViewedPostIDs: [String]
 
-    let service: any RedditService
+    private let fixtureService: any RedditService
+    private let oauth: RedditOAuthManager
+    private(set) var service: any RedditService
 
-    init(service: any RedditService) {
+    init(
+        service: any RedditService,
+        oauth: RedditOAuthManager = RedditOAuthManager()
+    ) {
+        fixtureService = service
         self.service = service
+        self.oauth = oauth
         let defaults = UserDefaults.standard
         if
             let data = defaults.data(forKey: DefaultsKey.preferences),
@@ -85,6 +96,7 @@ final class AppModel: ObservableObject {
     }
 
     func start() async {
+        await restoreRedditConnection()
         async let loadPosts: Void = refresh()
         async let loadAccounts: Void = fetchAccounts()
         _ = await (loadPosts, loadAccounts)
@@ -178,6 +190,45 @@ final class AppModel: ObservableObject {
         URLCache.shared.removeAllCachedResponses()
     }
 
+    var isRedditOAuthConfigured: Bool {
+        oauth.isConfigured
+    }
+
+    var redditRequestedScopes: String {
+        oauth.requestedScopesDescription
+    }
+
+    var isRedditConnected: Bool {
+        if case .connected = redditConnectionState { return true }
+        return false
+    }
+
+    func connectReddit() async {
+        guard !isAuthenticatingReddit else { return }
+        isAuthenticatingReddit = true
+        redditConnectionError = nil
+        redditConnectionState = .connecting
+        defer { isAuthenticatingReddit = false }
+
+        do {
+            let account = try await oauth.authorize()
+            activateLiveService(account: account)
+            await refresh()
+        } catch {
+            redditConnectionError = error.localizedDescription
+            redditConnectionState = .failed(message: error.localizedDescription)
+        }
+    }
+
+    func disconnectReddit() async {
+        await oauth.logout()
+        service = fixtureService
+        redditConnectionState = .fixture
+        redditConnectionError = nil
+        await fetchAccounts()
+        await refresh()
+    }
+
     var biometricAvailabilityDescription: String {
         let context = LAContext()
         var error: NSError?
@@ -202,6 +253,31 @@ final class AppModel: ObservableObject {
         let bytes = imageCacheLimitMB * 1_024 * 1_024
         URLCache.shared.diskCapacity = bytes
         URLCache.shared.memoryCapacity = min(bytes / 4, 64 * 1_024 * 1_024)
+    }
+
+    private func restoreRedditConnection() async {
+        guard oauth.hasStoredCredential else { return }
+        do {
+            if let account = try await oauth.restoreAccount() {
+                activateLiveService(account: account)
+            }
+        } catch {
+            redditConnectionError = error.localizedDescription
+            redditConnectionState = .failed(message: error.localizedDescription)
+        }
+    }
+
+    private func activateLiveService(account: AccountSummary) {
+        guard let configuration = oauth.apiConfiguration else { return }
+        let oauth = oauth
+        service = DataAPIRedditService(
+            configuration: configuration,
+            account: account,
+            tokenProvider: { try await oauth.validAccessToken() }
+        )
+        accounts = [account]
+        redditConnectionState = .connected(username: account.username)
+        redditConnectionError = nil
     }
 
     private enum DefaultsKey {

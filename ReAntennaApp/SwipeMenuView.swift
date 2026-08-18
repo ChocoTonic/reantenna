@@ -27,16 +27,24 @@ struct SwipeMenuView: View {
                 }
 
                 menuSection("Accounts") {
-                    ForEach(model.accounts) { account in
-                        row(account.username, icon: "person.crop.circle", accessory: "checkmark") {
-                            model.closeMenu()
+                    if model.isRedditConnected {
+                        ForEach(model.accounts) { account in
+                            row(account.username, icon: "person.crop.circle", accessory: "checkmark") {
+                                model.selectRoute(.redditAccount)
+                            }
                         }
+                    } else {
+                        row("Fixture mode", icon: "testtube.2") { model.closeMenu() }
                     }
+                    row(
+                        model.isRedditConnected ? "Manage Reddit account" : "Connect Reddit",
+                        icon: "person.badge.key"
+                    ) { model.selectRoute(.redditAccount) }
                 }
 
                 menuSection("User") {
                     row("Profile", icon: "person.text.rectangle") { model.selectRoute(.listing("Profile")) }
-                    row("Login another account", icon: "person.badge.plus") { model.selectRoute(.listing("Login")) }
+                    row("Reddit account", icon: "person.badge.plus") { model.selectRoute(.redditAccount) }
                 }
             }
             .padding(.bottom, 18)

@@ -40,4 +40,24 @@ final class AntennaCoreTests: XCTestCase {
 
         XCTAssertEqual(ids, Set(["c1", "c1-1", "c2"]))
     }
+
+    func testRedditConfigurationRequiresEveryOAuthField() {
+        let configuration = RedditAPIConfiguration(
+            clientID: "",
+            redirectURI: "reantenna://oauth",
+            userAgent: "ios:com.chocotonic.reantenna:v0.1 (by /u/example)"
+        )
+
+        XCTAssertFalse(configuration.isUsable)
+    }
+
+    func testApprovedRedditConfigurationIsUsable() {
+        let configuration = RedditAPIConfiguration(
+            clientID: "approved-client-id",
+            redirectURI: "reantenna://oauth",
+            userAgent: "ios:com.chocotonic.reantenna:v0.1 (by /u/example)"
+        )
+
+        XCTAssertTrue(configuration.isUsable)
+    }
 }

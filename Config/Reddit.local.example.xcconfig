@@ -1,0 +1,4 @@
+// Copy this file to Reddit.local.xcconfig after Reddit approves the app.
+// An installed/native app has a client ID but no client secret.
+REDDIT_CLIENT_ID = YOUR_INSTALLED_APP_CLIENT_ID
+REDDIT_DEVELOPER_USERNAME = YOUR_REDDIT_USERNAME_WITHOUT_U_SLASH

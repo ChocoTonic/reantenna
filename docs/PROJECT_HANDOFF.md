@@ -11,10 +11,14 @@ Last verified: 2026-08-18
   LocalDevVPN, showing a seven-day expiry and eight remaining weekly App IDs.
 - ReAntenna 0.1.0 (build 1) was built as an unsigned arm64 iPhoneOS IPA, installed
   through SideStore, and launched successfully on the physical phone.
+- ReAntenna 0.2.0 (build 2) adds the approval-gated read-only Reddit OAuth
+  foundation and is ready to package as an in-place update. With no local client
+  ID configured it intentionally remains in fixture mode.
 - Source bundle ID is `com.chocotonic.reantenna`. SideStore appends the signing
   team's stable suffix on-device, producing `com.chocotonic.reantenna.S9J42W9ZJJ`.
-- Next checkpoint: configure and observe an unattended refresh, then test an
-  in-place ReAntenna update without deleting the installed app.
+- Next checkpoint: install build 2 over build 1 without deleting the app, verify
+  local preferences/history survive, then configure and observe an unattended
+  SideStore refresh.
 
 This is the durable pickup point for the project. It records what exists, what is
 still a prototype, what information or accounts are needed from the owner, and the
@@ -83,10 +87,16 @@ Do these in this order:
   implemented.
 - A replaceable `RedditService` boundary, `FixtureRedditService`, and the beginning
   of an approval-gated `DataAPIRedditService`.
+- Installed-app OAuth authorization uses `ASWebAuthenticationSession`, a
+  cryptographically random and exactly validated `state`, permanent refresh
+  access, automatic refresh, revocation/logout, and this-device-only Keychain
+  storage. The app requests only `identity`, `read`, and `mysubreddits` initially.
+- A Reddit Account screen reports the real connection state. If no approved local
+  client configuration exists, the app honestly stays in fixture mode.
 
 ### Build and CI state
 
-- The project builds and launches in the simulator and five unit tests pass.
+- The project builds and launches in the simulator and seven unit tests pass.
 - CI builds/tests every pull request and `main` push.
 - Main-branch simulator snapshots keep only the newest three artifacts.
 - Tags/commits preserve source for historical rebuilds; the snapshot workflow can
@@ -103,12 +113,9 @@ Do these in this order:
 ### Required for a real Reddit client
 
 - Reddit approval for this exact noncommercial native-client use case.
-- Installed-app OAuth login and callback handling using
-  `ASWebAuthenticationSession`, unique `state` validation, token exchange, refresh,
-  logout, and Keychain storage.
-- Selection of least-privilege OAuth scopes; read-only behavior should land before
-  write scopes.
-- Connection of `DataAPIRedditService` to the app instead of fixtures.
+- Validation of the installed-app OAuth flow against a newly approved client ID.
+- Live-read hardening after that validation, including explicit token-error parsing
+  and recovery when Reddit invalidates a stored grant.
 - Complete listing/thread decoding, pagination, `more` comments, account switching,
   API errors, rate-limit handling, retries, cache expiry, and deletion handling.
 - Real search, subreddit/user feeds, saved/hidden items, profile, inbox, voting,
@@ -139,8 +146,8 @@ Do these in this order:
 - A permanent reverse-DNS bundle identifier.
 - A Reddit username to place in the required descriptive User-Agent.
 - The result of Reddit's Data API review and the newly issued **installed-app client
-  ID**. The client ID is not a native-app secret, but it should still be supplied
-  through local configuration rather than hard-coded into tracked source.
+  ID**. The client ID is not a native-app secret, but it is supplied through ignored
+  `Config/Reddit.local.xcconfig`, not hard-coded into tracked source.
 - Confirmation at each `STOP` checkpoint below. We should not skip ahead because a
   bad pairing or first refresh is easier to diagnose before an app IPA is involved.
 
@@ -194,7 +201,7 @@ identity/read/subreddit/history-related access; add vote/save/submit/private-mes
 scopes only when those features are real. Use a User-Agent shaped like:
 
 ```text
-ios:com.chocotonic.reantenna:0.1.0 (by /u/YOUR_USERNAME)
+ios:com.chocotonic.reantenna:0.2.0 (by /u/YOUR_USERNAME)
 ```
 
 Replace the identifier and username with the final values. The redirect URI must
@@ -207,18 +214,22 @@ review path first and retain the approval email/reference.
 **STOP:** Confirm approval and provide only the client ID and registered callback.
 Do not provide passwords, authorization codes, access tokens, or refresh tokens.
 
-### R3 — implementation after approval
+### R3 — configure and validate the implemented OAuth foundation
 
-The next coding session will:
+The code for the callback URL scheme, authentication session, random `state`, code
+exchange, refresh, revocation/logout, Keychain storage, and read-only service switch
+is complete. After approval:
 
-1. Add an untracked local configuration file and a committed example template.
-2. Register the callback URL scheme in `project.yml` and regenerate the project.
-3. Implement `ASWebAuthenticationSession`, cryptographically random `state`, exact
-   callback validation, code exchange, refresh, and revocation/logout.
-4. Store refresh/access tokens in Keychain, isolated per Reddit account.
-5. Start with read-only feeds and comments, then add write operations one family at
-   a time.
-6. Respect `x-ratelimit-*` headers and Reddit's current caching/deletion rules.
+1. Copy `Config/Reddit.local.example.xcconfig` to the ignored
+   `Config/Reddit.local.xcconfig`.
+2. Set `REDDIT_CLIENT_ID` and `REDDIT_DEVELOPER_USERNAME`; do not set a secret.
+3. Run `xcodegen generate`, rebuild the IPA, and update it in SideStore.
+4. Open **Menu → Reddit Account → Connect Reddit**, approve the three displayed
+   read-only scopes, and confirm the screen shows `u/YOUR_USERNAME`.
+5. Verify a live front page and thread load, relaunch the app to exercise token
+   restoration, then disconnect and verify local credentials are gone.
+6. Only after this succeeds, implement write operations one family at a time and
+   add their scopes deliberately.
 
 The old Antenna client ID, cookies, bearer tokens, and refresh tokens are forbidden.
 

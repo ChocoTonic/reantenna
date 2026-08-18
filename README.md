@@ -2,7 +2,7 @@
 
 ReAntenna is an unofficial, open-source reimplementation inspired by the discontinued Antenna (formerly AMRC) Reddit client. It is not affiliated with or endorsed by the original Antenna developer.
 
-The project is independently written and uses original assets. It recreates Antenna's gesture-first speed and information density without copying the original source code, icon, artwork, or proprietary resources. It currently runs entirely against deterministic fixture data, so the interaction layer can be developed without using unapproved Reddit access.
+The project is independently written and uses original assets. It recreates Antenna's gesture-first speed and information density without copying the original source code, icon, artwork, or proprietary resources. It uses deterministic fixture data until an approved Reddit OAuth client is configured.
 
 ## Implemented milestone
 
@@ -25,6 +25,9 @@ The project is independently written and uses original assets. It recreates Ante
 - Persistent layout, theme, link-preview, history, navigation, and text-size preferences
 - Replaceable `RedditService` boundary
 - Fixture service and platform-neutral core smoke checks
+- Approval-gated installed-app OAuth flow with state validation, refresh, revocation,
+  and Keychain token storage
+- Read-only live Reddit service activation with automatic fixture fallback
 
 ## Open the project
 
@@ -74,6 +77,18 @@ the checkpoint-by-checkpoint iOS 18 SideStore setup, see
 
 Do not put old Antenna credentials, tokens, cookies, or client identifiers into this project. Live integration requires separately approved Reddit Data API credentials. Until then, `FixtureRedditService` is the active transport.
 
+After approval, copy the example local configuration:
+
+```sh
+cp Config/Reddit.local.example.xcconfig Config/Reddit.local.xcconfig
+open -e Config/Reddit.local.xcconfig
+xcodegen generate
+```
+
+Enter only the installed-app client ID and your Reddit username. Do not add a
+client secret: an installed/native app does not have one. The local file is ignored
+by Git. Reddit must register the callback exactly as `reantenna://oauth`.
+
 The intended live implementation is `DataAPIRedditService`, conforming to the same protocol:
 
 ```swift
@@ -88,9 +103,11 @@ No view knows whether its content came from fixtures, Reddit's Data API, or a fu
 
 ## What works today
 
-ReAntenna is currently an interaction prototype, not yet a live Reddit client. The feed,
-sorting, layouts, swipe navigation, appearance preferences, thread traversal, and comment
-collapse controls operate against deterministic fixtures. In particular, **Collapse
+ReAntenna is currently an interaction prototype with a completed read-only OAuth
+foundation, but it cannot be validated as a live Reddit client until Reddit approves
+and issues a client ID. Without that local configuration, the feed, sorting, layouts,
+swipe navigation, appearance preferences, thread traversal, and comment collapse controls
+operate against deterministic fixtures. In particular, **Collapse
 Children** keeps every root comment visible while hiding all of its descendants, matching
 the Antenna workflow this reconstruction is intended to preserve.
 

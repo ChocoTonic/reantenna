@@ -80,11 +80,14 @@ struct SettingsView: View {
                 }
 
                 Section("Accounts and privacy") {
-                    LabeledContent("Reddit connection", value: "Fixture mode")
+                    LabeledContent("Reddit connection", value: model.redditConnectionState.description)
+                    Button(model.isRedditConnected ? "Manage Reddit account" : "Connect Reddit") {
+                        model.selectRoute(.redditAccount)
+                    }
                     LabeledContent("Biometrics", value: model.biometricAvailabilityDescription)
                     LabeledContent("App lock", value: "Not implemented")
                         .foregroundStyle(.secondary)
-                    Text("OAuth account management and biometric locking are unavailable until live account support is implemented.")
+                    Text("Reddit OAuth is approval-gated and stores tokens in Keychain. Biometric locking is not implemented yet.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -104,7 +107,7 @@ struct SettingsView: View {
                 }
 
                 Section("About") {
-                    LabeledContent("ReAntenna", value: "Milestone 1")
+                    LabeledContent("ReAntenna", value: "Milestone 2")
                     Text("An independently written, gesture-first Reddit reader inspired by compact native clients.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)

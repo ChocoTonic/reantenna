@@ -1,0 +1,6 @@
+// Safe tracked defaults. Personal Reddit configuration belongs in the optional
+// ignored file below, never in source code or the generated Xcode project.
+REDDIT_CLIENT_ID =
+REDDIT_DEVELOPER_USERNAME =
+
+#include? "Reddit.local.xcconfig"

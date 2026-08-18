@@ -51,6 +51,9 @@ struct RootView: View {
                     case .settings:
                         SettingsView()
                             .reAntennaNavigationChromeHidden()
+                    case .redditAccount:
+                        RedditAccountView()
+                            .reAntennaNavigationChromeHidden()
                     case let .listing(title):
                         PlaceholderListingView(title: title)
                             .reAntennaNavigationChromeHidden()

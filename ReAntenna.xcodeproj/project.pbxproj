@@ -21,8 +21,10 @@
 		66954387DF2462D37BD9B6D2 /* RedditService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3075361B0299FB0946961FBA /* RedditService.swift */; };
 		82A33A9B6B0C9F78C08FBEEF /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22A677384D5E61D48EAE440 /* RootView.swift */; };
 		847B10AFD95F4D58BBDC439A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F5FBC5B839BB3849A99064 /* SettingsView.swift */; };
+		B82111845EF5AA349A670FA5 /* RedditOAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */; };
 		BFF83EEBBDD8C484A666CD61 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF8A26B7A4513A68A4369B62 /* Theme.swift */; };
 		D16FD919EB11750842CA9073 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB3A7C565281BCB8AC645759 /* AppModel.swift */; };
+		DCC8395E0B750A7819DE3E59 /* RedditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A865D645D1C90452C761F0 /* RedditAccountView.swift */; };
 		DE3AC220F529D810491BFF20 /* FixtureRedditService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3467003D8D9452C860F4E874 /* FixtureRedditService.swift */; };
 		E3566D2D4EA229429F1EE497 /* AntennaCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1AE2539D6F1253A23986C599 /* AntennaCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FDBB720E754E38844BA2EF8E /* ReAntennaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B11AB9F63CE208B08494C7E /* ReAntennaApp.swift */; };
@@ -79,15 +81,19 @@
 		1E4E4E9A2F470CD5356210B4 /* ReAntenna.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReAntenna.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3075361B0299FB0946961FBA /* RedditService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedditService.swift; sourceTree = "<group>"; };
 		3467003D8D9452C860F4E874 /* FixtureRedditService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureRedditService.swift; sourceTree = "<group>"; };
+		48A865D645D1C90452C761F0 /* RedditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedditAccountView.swift; sourceTree = "<group>"; };
 		51BBC790038680550CC7B428 /* AntennaCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntennaCoreTests.swift; sourceTree = "<group>"; };
 		63F3CCC923E4C2D5882BDEB8 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		71F5FBC5B839BB3849A99064 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		85D6D7D3D02A4CA6B58F3392 /* RedditConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = RedditConfig.xcconfig; sourceTree = "<group>"; };
 		92C8C9943A7288D699AC26AE /* TopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBar.swift; sourceTree = "<group>"; };
 		92E618BDC44C294A6FF5F936 /* SwipeMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeMenuView.swift; sourceTree = "<group>"; };
 		94A7706BE9C4319FAF7AB68E /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
+		9B5938BBFCD6AC8162D8D9F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BA651FF3F365CCB19C22CB65 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		BE22F5307CC1F4A4E1D43E34 /* CommentTraversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTraversal.swift; sourceTree = "<group>"; };
 		BF8A26B7A4513A68A4369B62 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedditOAuthManager.swift; sourceTree = "<group>"; };
 		CFDCBBC061FD7C8A05BDE4A6 /* DataAPIRedditService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataAPIRedditService.swift; sourceTree = "<group>"; };
 		EB3A7C565281BCB8AC645759 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		F22A677384D5E61D48EAE440 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -121,9 +127,18 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		73FEB8064021AD910CE02CDF /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				85D6D7D3D02A4CA6B58F3392 /* RedditConfig.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		7E7356D41BDEF34E2A4153BF = {
 			isa = PBXGroup;
 			children = (
+				73FEB8064021AD910CE02CDF /* Config */,
 				E80CCF5409528388924F6E1A /* ReAntennaApp */,
 				FAAEC4D1347FA1B7BE14084A /* Sources */,
 				49C871079A8E995B29D795AE /* Tests */,
@@ -154,9 +169,12 @@
 			children = (
 				EB3A7C565281BCB8AC645759 /* AppModel.swift */,
 				63F3CCC923E4C2D5882BDEB8 /* FeedView.swift */,
+				9B5938BBFCD6AC8162D8D9F5 /* Info.plist */,
 				09587CEB89AF6FFD75B63603 /* PlaceholderListingView.swift */,
 				94A7706BE9C4319FAF7AB68E /* PostDetailView.swift */,
 				0B11AB9F63CE208B08494C7E /* ReAntennaApp.swift */,
+				48A865D645D1C90452C761F0 /* RedditAccountView.swift */,
+				C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */,
 				F22A677384D5E61D48EAE440 /* RootView.swift */,
 				71F5FBC5B839BB3849A99064 /* SettingsView.swift */,
 				92E618BDC44C294A6FF5F936 /* SwipeMenuView.swift */,
@@ -312,6 +330,8 @@
 				06C2563CCA295FE47699EA61 /* PlaceholderListingView.swift in Sources */,
 				4369D525D3CAC4F90E742A69 /* PostDetailView.swift in Sources */,
 				FDBB720E754E38844BA2EF8E /* ReAntennaApp.swift in Sources */,
+				DCC8395E0B750A7819DE3E59 /* RedditAccountView.swift in Sources */,
+				B82111845EF5AA349A670FA5 /* RedditOAuthManager.swift in Sources */,
 				82A33A9B6B0C9F78C08FBEEF /* RootView.swift in Sources */,
 				847B10AFD95F4D58BBDC439A /* SettingsView.swift in Sources */,
 				FEFF3F251F50F23467F206E9 /* SwipeMenuView.swift in Sources */,
@@ -346,23 +366,17 @@
 /* Begin XCBuildConfiguration section */
 		102ED02239DF7182CA0860F9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 85D6D7D3D02A4CA6B58F3392 /* RedditConfig.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = ReAntenna;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				CURRENT_PROJECT_VERSION = 2;
+				INFOPLIST_FILE = ReAntennaApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chocotonic.reantenna;
 				PRODUCT_NAME = ReAntenna;
 				SDKROOT = iphoneos;
@@ -388,23 +402,17 @@
 		};
 		22E98456A9397E438B308C0F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 85D6D7D3D02A4CA6B58F3392 /* RedditConfig.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = ReAntenna;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				CURRENT_PROJECT_VERSION = 2;
+				INFOPLIST_FILE = ReAntennaApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chocotonic.reantenna;
 				PRODUCT_NAME = ReAntenna;
 				SDKROOT = iphoneos;
