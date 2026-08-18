@@ -1,6 +1,20 @@
 # ReAntenna project handoff and next-session runbook
 
-Last verified: 2026-08-17
+Last verified: 2026-08-18
+
+## Current deployment status
+
+- Mac mini M1, macOS 26.5.1, Xcode 26.6; full Xcode is the active developer
+  directory.
+- Target device: iPhone SE (3rd generation), iOS 18.7.8, Developer Mode enabled.
+- SideStore 0.6.3 is installed and completed its first self-refresh through
+  LocalDevVPN, showing a seven-day expiry and eight remaining weekly App IDs.
+- ReAntenna 0.1.0 (build 1) was built as an unsigned arm64 iPhoneOS IPA, installed
+  through SideStore, and launched successfully on the physical phone.
+- Source bundle ID is `com.chocotonic.reantenna`. SideStore appends the signing
+  team's stable suffix on-device, producing `com.chocotonic.reantenna.S9J42W9ZJJ`.
+- Next checkpoint: configure and observe an unattended refresh, then test an
+  in-place ReAntenna update without deleting the installed app.
 
 This is the durable pickup point for the project. It records what exists, what is
 still a prototype, what information or accounts are needed from the owner, and the
@@ -15,20 +29,17 @@ documentation explicitly redirects us there.
 
 Do these in this order:
 
-1. Complete **Checkpoint 0: version inventory** below and send the results.
-2. On the Mac, make full Xcode the active command-line developer directory:
+1. Check the **Current deployment status** above.
+2. Full Xcode has been selected with:
 
    ```sh
    sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
    xcodebuild -version
    ```
 
-   Xcode 26.6 is installed, but at handoff time `xcode-select` still points to
-   `/Library/Developer/CommandLineTools`. The command above requires the Mac
-   administrator password and therefore needs to be run by the owner.
-3. Decide on the permanent bundle identifier. A reasonable default is
-   `com.chocotonic.reantenna`; do not change it after installing the app if local
-   data should survive updates.
+   This has been completed and `xcodebuild -version` reports Xcode 26.6.
+3. Keep the permanent bundle identifier `com.chocotonic.reantenna`; do not change
+   it after installing the app if local data should survive updates.
 4. Decide whether the currently private GitHub repository should actually become
    open source. It needs a license before it should be described as open source to
    Reddit. The code is currently in a private repository and has no `LICENSE` file.
@@ -83,9 +94,9 @@ Do these in this order:
 - A manual signed-device workflow exists for a future paid developer team, but it
   is not needed for this free SideStore plan and no signing secrets should be added
   to GitHub for a Personal Team.
-- On 2026-08-17 an unsigned **arm64 iPhoneOS** Release build was successfully
-  produced with Xcode 26.6 by explicitly setting `DEVELOPER_DIR`. This validates
-  the core of the planned SideStore IPA packaging process.
+- On 2026-08-18 an unsigned **arm64 iPhoneOS** Release IPA was produced with Xcode
+  26.6 and installed through SideStore on iOS 18.7.8. The repeatable build command
+  is `scripts/build-sidestore-ipa.sh`.
 
 ## What still needs to be built
 
@@ -115,8 +126,8 @@ Do these in this order:
 - Original app icon and finished visual assets.
 - Accessibility audit, UI tests, performance profiling, and physical iOS 18
   gesture testing.
-- A repeatable `scripts/build-sidestore-ipa.sh` command and, only after the manual
-  process works, an unsigned-IPA GitHub workflow.
+- An unsigned-IPA GitHub workflow, if local SideStore installation proves stable.
+  The repeatable local `scripts/build-sidestore-ipa.sh` command is now available.
 
 ## What is needed from the owner
 
@@ -469,23 +480,7 @@ SideStore will apply the free development signature. The input must still be an
 
 ```sh
 cd /Users/asdf/repos/reantenna
-export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
-xcodebuild \
-  -project ReAntenna.xcodeproj \
-  -scheme ReAntenna \
-  -configuration Release \
-  -destination 'generic/platform=iOS' \
-  -derivedDataPath build/DerivedData \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGNING_REQUIRED=NO \
-  build
-mkdir -p build/ipa/Payload
-ditto build/DerivedData/Build/Products/Release-iphoneos/ReAntenna.app \
-  build/ipa/Payload/ReAntenna.app
-ditto -c -k --sequesterRsrc --keepParent build/ipa/Payload \
-  build/ReAntenna-unsigned.ipa
-file build/ipa/Payload/ReAntenna.app/ReAntenna
-unzip -t build/ReAntenna-unsigned.ipa
+scripts/build-sidestore-ipa.sh
 ```
 
 **Success looks like:** `file` reports an arm64 Mach-O executable, `unzip -t`
@@ -520,14 +515,17 @@ and has a remaining-days counter near seven. SideStore plus ReAntenna should con
 two of the three free active-app slots.
 
 **Important settings:** Do not ask SideStore to randomize/change the bundle ID if
-the option appears. Stable identity is required for in-place updates and local data.
+the option appears. SideStore normally appends the stable signing-team suffix; keep
+using the same Apple Account so that suffix and the app's data container remain
+consistent across updates.
 
 **Common failure:** If installation reports an App ID/app-limit error, inspect My
 Apps and deactivate/remove an unneeded sideloaded app; remember SideStore counts as
 one. For Wi-Fi/VPN errors, repeat the official common-issues sequence from
 Checkpoint 4.
 
-**STOP:** Confirm ReAntenna launches and both counters are visible.
+**Completed 2026-08-18:** ReAntenna 0.1.0 launched from a SideStore-signed IPA on
+iOS 18.7.8. Both apps are visible to the device and use the same team suffix.
 
 ### Checkpoint 10 — prove ReAntenna refreshes without the Mac
 
@@ -600,4 +598,3 @@ The next milestone is complete only when all of these are true:
   reminder retained as protection against iOS skipping background work.
 - Reddit has either approved the Data API request, or the project has a recorded
   approval blocker and continues safely on fixtures.
-

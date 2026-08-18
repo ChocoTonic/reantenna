@@ -1,6 +1,6 @@
 name: ReAntenna
 options:
-  bundleIdPrefix: com.example.reantenna
+  bundleIdPrefix: com.chocotonic.reantenna
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -17,7 +17,7 @@ targets:
       - Sources/AntennaCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.reantenna.core
+        PRODUCT_BUNDLE_IDENTIFIER: com.chocotonic.reantenna.core
         GENERATE_INFOPLIST_FILE: YES
   ReAntenna:
     type: application
@@ -28,8 +28,10 @@ targets:
       - target: AntennaCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.reantenna.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.chocotonic.reantenna
         PRODUCT_NAME: ReAntenna
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: ReAntenna
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.news
