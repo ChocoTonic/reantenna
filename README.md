@@ -61,10 +61,12 @@ The normal `AntennaCoreTests` XCTest target is included, but Apple's standalone 
 
 ## Continuous integration and builds
 
-GitHub Actions builds and tests the app on a pinned macOS runner. Main-branch
+GitHub Actions is configured to build and test on a pinned macOS runner. Main-branch
 simulator snapshots retain only the newest three artifacts, while Git tags retain
 the source needed to rebuild any older version. A manual workflow accepts any tag,
-branch, or commit SHA for historical rebuilds.
+branch, or commit SHA for historical rebuilds. Runs are presently blocked at the
+account level by GitHub billing/spending settings for macOS runners; no job step is
+starting until that owner setting is resolved or the repository becomes public.
 
 See [docs/RELEASING.md](docs/RELEASING.md) for the retention policy, free Personal
 Team limitation, and optional signed-build secrets.

@@ -12,8 +12,9 @@ Last verified: 2026-08-18
 - ReAntenna 0.1.0 (build 1) was built as an unsigned arm64 iPhoneOS IPA, installed
   through SideStore, and launched successfully on the physical phone.
 - ReAntenna 0.2.0 (build 2) adds the approval-gated read-only Reddit OAuth
-  foundation and is ready to package as an in-place update. With no local client
-  ID configured it intentionally remains in fixture mode.
+  foundation and has been packaged as an in-place update at
+  `~/Library/Mobile Documents/com~apple~CloudDocs/Downloads/ReAntenna-0.2.0-build-2.ipa`.
+  With no local client ID configured it intentionally remains in fixture mode.
 - Source bundle ID is `com.chocotonic.reantenna`. SideStore appends the signing
   team's stable suffix on-device, producing `com.chocotonic.reantenna.S9J42W9ZJJ`.
 - Next checkpoint: install build 2 over build 1 without deleting the app, verify
@@ -97,7 +98,10 @@ Do these in this order:
 ### Build and CI state
 
 - The project builds and launches in the simulator and seven unit tests pass.
-- CI builds/tests every pull request and `main` push.
+- CI is configured to build/test every pull request and `main` push, but GitHub is
+  refusing to start any job because the account reports a failed payment or an
+  insufficient Actions spending limit. The owner must resolve **Settings → Billing
+  & plans**, or choose to make this repository public, before macOS jobs can run.
 - Main-branch simulator snapshots keep only the newest three artifacts.
 - Tags/commits preserve source for historical rebuilds; the snapshot workflow can
   rebuild any ref manually.
