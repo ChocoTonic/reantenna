@@ -75,6 +75,10 @@ For the current project status, owner prerequisites, Reddit approval checklist, 
 the checkpoint-by-checkpoint iOS 18 SideStore setup, see
 [docs/PROJECT_HANDOFF.md](docs/PROJECT_HANDOFF.md).
 
+Running `scripts/build-sidestore-ipa.sh` leaves the canonical unsigned artifact at
+`build/ReAntenna-unsigned.ipa` and also copies a versioned IPA to `~/Downloads`.
+Set `MACOS_DOWNLOADS_DIR` to override that second destination.
+
 ## Reddit integration
 
 Do not put old Antenna credentials, tokens, cookies, or client identifiers into this project. Live integration requires separately approved Reddit Data API credentials. Until then, `FixtureRedditService` is the active transport.

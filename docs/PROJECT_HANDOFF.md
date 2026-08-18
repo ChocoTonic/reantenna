@@ -110,7 +110,9 @@ Do these in this order:
   to GitHub for a Personal Team.
 - On 2026-08-18 an unsigned **arm64 iPhoneOS** Release IPA was produced with Xcode
   26.6 and installed through SideStore on iOS 18.7.8. The repeatable build command
-  is `scripts/build-sidestore-ipa.sh`.
+  is `scripts/build-sidestore-ipa.sh`. A successful build also copies a versioned
+  artifact to the Mac's `~/Downloads` directory; `MACOS_DOWNLOADS_DIR` can override
+  that destination.
 
 ## What still needs to be built
 

@@ -41,4 +41,13 @@ rm -f "$ipa_path"
 unzip -t "$ipa_path"
 file "$package_dir/Payload/ReAntenna.app/ReAntenna"
 
+version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app_path/Info.plist")
+build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app_path/Info.plist")
+downloads_dir=${MACOS_DOWNLOADS_DIR:-"$HOME/Downloads"}
+downloads_ipa="$downloads_dir/ReAntenna-$version-build-$build_number.ipa"
+
+mkdir -p "$downloads_dir"
+cp -p "$ipa_path" "$downloads_ipa"
+
 echo "SideStore IPA: $ipa_path"
+echo "macOS Downloads copy: $downloads_ipa"
