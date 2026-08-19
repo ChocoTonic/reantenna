@@ -18,6 +18,7 @@ enum AppRoute: Hashable {
     case post(String)
     case settings
     case redditAccount
+    case privacy
     case listing(String)
 }
 
@@ -85,6 +86,7 @@ final class AppModel: ObservableObject {
         imageCacheLimitMB = defaults.object(forKey: DefaultsKey.imageCacheLimit) as? Int ?? 256
         recentlyViewedPostIDs = defaults.stringArray(forKey: DefaultsKey.history) ?? []
         configureURLCache()
+        enforceCacheRetentionWindow()
     }
 
     var preferredColorScheme: ColorScheme? {
@@ -229,6 +231,17 @@ final class AppModel: ObservableObject {
         await refresh()
     }
 
+    func deleteAllRedditData() async {
+        await oauth.logout()
+        service = fixtureService
+        redditConnectionState = .fixture
+        redditConnectionError = nil
+        clearReadHistory()
+        clearMediaCache()
+        await fetchAccounts()
+        await refresh()
+    }
+
     var biometricAvailabilityDescription: String {
         let context = LAContext()
         var error: NSError?
@@ -253,6 +266,15 @@ final class AppModel: ObservableObject {
         let bytes = imageCacheLimitMB * 1_024 * 1_024
         URLCache.shared.diskCapacity = bytes
         URLCache.shared.memoryCapacity = min(bytes / 4, 64 * 1_024 * 1_024)
+    }
+
+    private func enforceCacheRetentionWindow() {
+        let defaults = UserDefaults.standard
+        let lastPurge = defaults.object(forKey: DefaultsKey.lastCachePurge) as? Date
+        if lastPurge.map({ Date().timeIntervalSince($0) >= 48 * 60 * 60 }) ?? true {
+            clearMediaCache()
+            defaults.set(Date(), forKey: DefaultsKey.lastCachePurge)
+        }
     }
 
     private func restoreRedditConnection() async {
@@ -287,5 +309,6 @@ final class AppModel: ObservableObject {
         static let cellularLimit = "reantenna.cellular-download-limit-mb"
         static let imageCacheLimit = "reantenna.image-cache-limit-mb"
         static let history = "reantenna.recently-viewed-post-ids"
+        static let lastCachePurge = "reantenna.last-cache-purge"
     }
 }

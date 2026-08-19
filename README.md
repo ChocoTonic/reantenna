@@ -1,6 +1,6 @@
 # ReAntenna
 
-ReAntenna is an unofficial, open-source reimplementation inspired by the discontinued Antenna (formerly AMRC) Reddit client. It is not affiliated with or endorsed by the original Antenna developer.
+ReAntenna is an unofficial, source-available reimplementation inspired by the discontinued Antenna (formerly AMRC) Reddit client. It is not affiliated with or endorsed by the original Antenna developer. No open-source license has been selected yet.
 
 The project is independently written and uses original assets. It recreates Antenna's gesture-first speed and information density without copying the original source code, icon, artwork, or proprietary resources. It uses deterministic fixture data until an approved Reddit OAuth client is configured.
 
@@ -82,6 +82,8 @@ Set `MACOS_DOWNLOADS_DIR` to override that second destination.
 ## Reddit integration
 
 Do not put old Antenna credentials, tokens, cookies, or client identifiers into this project. Live integration requires separately approved Reddit Data API credentials. Until then, `FixtureRedditService` is the active transport.
+
+The [privacy policy](PRIVACY.md) describes local storage, retention, and deletion.
 
 After approval, copy the example local configuration:
 

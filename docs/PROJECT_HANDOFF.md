@@ -45,9 +45,9 @@ Do these in this order:
    This has been completed and `xcodebuild -version` reports Xcode 26.6.
 3. Keep the permanent bundle identifier `com.chocotonic.reantenna`; do not change
    it after installing the app if local data should survive updates.
-4. Decide whether the currently private GitHub repository should actually become
+4. Decide whether the public, source-available GitHub repository should become
    open source. It needs a license before it should be described as open source to
-   Reddit. The code is currently in a private repository and has no `LICENSE` file.
+   Reddit. The repository is public but has no `LICENSE` file.
 5. Begin the Reddit Data API request in **Reddit access**. Never paste an Apple
    password, Reddit password, OAuth refresh token, signing certificate, or device
    pairing file into chat or the repository.
@@ -91,9 +91,15 @@ Do these in this order:
 - Installed-app OAuth authorization uses `ASWebAuthenticationSession`, a
   cryptographically random and exactly validated `state`, permanent refresh
   access, automatic refresh, revocation/logout, and this-device-only Keychain
-  storage. The app requests only `identity`, `read`, and `mysubreddits` initially.
+  storage. The app requests only `identity` and `read` initially.
 - A Reddit Account screen reports the real connection state. If no approved local
   client configuration exists, the app honestly stays in fixture mode.
+- A public and in-app privacy policy describes collection, on-device storage,
+  retention, sharing, and deletion. The account screen can revoke authorization
+  and delete credentials, history, and cached responses.
+- Reddit API sessions do not use persistent URL caching. A 60-request rolling
+  client ceiling, Reddit rate-limit reset blocking, HTTP 429 handling, and a
+  48-hour local media-cache purge are implemented.
 
 ### Build and CI state
 
@@ -176,20 +182,20 @@ or model training. A truthful application description is:
 > client, independently implemented as an unofficial spiritual successor to the
 > discontinued Antenna/AMRC interface. It is for one developer's personal device,
 > stores account tokens only in the iOS Keychain, does not sell or train on Reddit
-> data, and will use OAuth plus a descriptive User-Agent. Source URL: [public URL
-> only if the repository has actually been made public].
+> data, and will use OAuth plus a descriptive User-Agent. Source URL:
+> https://github.com/ChocoTonic/reantenna.
 
 **Success looks like:** We have one stable bundle ID and can truthfully describe the
-repository as either private personal source or public open source.
+repository accurately as public source-available code until a license is selected.
 
-**Important choice:** Do not claim the current private, unlicensed repository is
+**Important choice:** Do not claim the current public, unlicensed repository is
 open source. Do not call the app official Antenna or imply endorsement.
 
 **Common failure:** A name or callback changes after OAuth registration. Fix it by
 settling the bundle ID and callback first. Proposed callback:
 `reantenna://oauth`.
 
-**STOP:** Send the chosen bundle ID, Reddit username, visibility, and license.
+**STOP:** Choose a license only if you want to make the source open source.
 
 ### R2 — request Data API access and register the client
 
@@ -203,7 +209,7 @@ If the approved flow directs you to `https://www.reddit.com/prefs/apps`, create 
 client ID. An installed app has no client secret because a phone cannot keep one.
 
 **Important choices:** Request only the capabilities we implement. Start with
-identity/read/subreddit/history-related access; add vote/save/submit/private-message
+identity and read access; add subreddit/vote/save/submit/private-message
 scopes only when those features are real. Use a User-Agent shaped like:
 
 ```text

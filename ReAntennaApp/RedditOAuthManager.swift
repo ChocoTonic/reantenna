@@ -87,7 +87,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
 
     private let callbackScheme = "reantenna"
     private let redirectURI = "reantenna://oauth"
-    private let scopes = ["identity", "read", "mysubreddits"]
+    private let scopes = ["identity", "read"]
     private let keychain = RedditCredentialKeychain()
     private let session: URLSession
     private var credential: StoredCredential?
@@ -96,13 +96,20 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
     let clientID: String
     let developerUsername: String
 
-    init(bundle: Bundle = .main, session: URLSession = .shared) {
+    init(bundle: Bundle = .main, session: URLSession? = nil) {
         clientID = (bundle.object(forInfoDictionaryKey: "RedditClientID") as? String ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         developerUsername = (
             bundle.object(forInfoDictionaryKey: "RedditDeveloperUsername") as? String ?? ""
         ).trimmingCharacters(in: .whitespacesAndNewlines)
-        self.session = session
+        if let session {
+            self.session = session
+        } else {
+            let sessionConfiguration = URLSessionConfiguration.ephemeral
+            sessionConfiguration.urlCache = nil
+            sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            self.session = URLSession(configuration: sessionConfiguration)
+        }
         credential = keychain.load()
         super.init()
     }
@@ -269,7 +276,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         guard let url = URL(string: "https://www.reddit.com/api/v1/access_token") else {
             throw RedditOAuthError.unavailable
         }
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("Basic \(Data("\(clientID):".utf8).base64EncodedString())", forHTTPHeaderField: "Authorization")
@@ -289,7 +296,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
             throw RedditOAuthError.unavailable
         }
         let token = try await validAccessToken()
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue(apiConfiguration?.userAgent, forHTTPHeaderField: "User-Agent")
         let (data, response) = try await session.data(for: request)
@@ -305,7 +312,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
 
     private func revoke(token: String) async throws {
         guard let url = URL(string: "https://www.reddit.com/api/v1/revoke_token") else { return }
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("Basic \(Data("\(clientID):".utf8).base64EncodedString())", forHTTPHeaderField: "Authorization")

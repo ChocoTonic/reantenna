@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RedditAccountView: View {
     @EnvironmentObject private var model: AppModel
+    @State private var confirmsDataDeletion = false
+    @State private var deletionMessage: String?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -40,12 +42,45 @@ struct RedditAccountView: View {
                     Text("No password, token, or historic Antenna credential is stored in project files or UserDefaults.")
                 }
 
+                Section("Data controls") {
+                    Button("Delete Reddit data from this device", role: .destructive) {
+                        confirmsDataDeletion = true
+                    }
+                    Text("Deletes OAuth credentials, read history, and cached responses, then returns the app to fixture mode.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
                 if let message = model.redditConnectionError {
                     Section("Last error") {
                         Text(message).foregroundStyle(.red)
                     }
                 }
             }
+        }
+        .confirmationDialog(
+            "Delete all locally stored Reddit data?",
+            isPresented: $confirmsDataDeletion,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Reddit Data", role: .destructive) {
+                Task {
+                    await model.deleteAllRedditData()
+                    deletionMessage = "Reddit data was deleted from this device."
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert(
+            "ReAntenna",
+            isPresented: Binding(
+                get: { deletionMessage != nil },
+                set: { if !$0 { deletionMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { deletionMessage = nil }
+        } message: {
+            Text(deletionMessage ?? "")
         }
     }
 }

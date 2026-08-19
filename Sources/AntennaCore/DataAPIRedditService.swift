@@ -40,18 +40,27 @@ public actor DataAPIRedditService: RedditService {
     private let tokenProvider: AccessTokenProvider
     private let account: AccountSummary
     private let session: URLSession
+    private var rateLimitBlockedUntil: Date?
+    private var recentRequestTimes: [Date] = []
 
     public private(set) var lastRateLimit: RedditRateLimit?
 
     public init(
         configuration: RedditAPIConfiguration,
         account: AccountSummary,
-        session: URLSession = .shared,
+        session: URLSession? = nil,
         tokenProvider: @escaping AccessTokenProvider
     ) {
         self.configuration = configuration
         self.account = account
-        self.session = session
+        if let session {
+            self.session = session
+        } else {
+            let sessionConfiguration = URLSessionConfiguration.ephemeral
+            sessionConfiguration.urlCache = nil
+            sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
+            self.session = URLSession(configuration: sessionConfiguration)
+        }
         self.tokenProvider = tokenProvider
     }
 
@@ -109,6 +118,16 @@ public actor DataAPIRedditService: RedditService {
         query: [URLQueryItem]
     ) async throws -> Response {
         guard configuration.isUsable else { throw RedditServiceError.unauthorized }
+        if let blockedUntil = rateLimitBlockedUntil, blockedUntil > Date() {
+            throw RedditServiceError.rateLimited(retryAfter: blockedUntil.timeIntervalSinceNow)
+        }
+        let now = Date()
+        recentRequestTimes.removeAll { now.timeIntervalSince($0) >= 60 }
+        if recentRequestTimes.count >= 60, let oldest = recentRequestTimes.first {
+            throw RedditServiceError.rateLimited(
+                retryAfter: max(1, 60 - now.timeIntervalSince(oldest))
+            )
+        }
 
         var components = URLComponents()
         components.scheme = "https"
@@ -118,11 +137,12 @@ public actor DataAPIRedditService: RedditService {
         guard let url = components.url else { throw RedditServiceError.unavailable }
 
         let token = try await tokenProvider()
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue(configuration.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
+        recentRequestTimes.append(now)
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else {
             throw RedditServiceError.unavailable
@@ -133,6 +153,17 @@ public actor DataAPIRedditService: RedditService {
             remaining: http.value(forHTTPHeaderField: "x-ratelimit-remaining").flatMap(Double.init),
             resetAfter: http.value(forHTTPHeaderField: "x-ratelimit-reset").flatMap(Double.init)
         )
+        if http.statusCode == 429 {
+            rateLimitBlockedUntil = Date().addingTimeInterval(lastRateLimit?.resetAfter ?? 60)
+        } else if let remaining = lastRateLimit?.remaining,
+           remaining <= 0,
+           let resetAfter = lastRateLimit?.resetAfter,
+           resetAfter > 0
+        {
+            rateLimitBlockedUntil = Date().addingTimeInterval(resetAfter)
+        } else {
+            rateLimitBlockedUntil = nil
+        }
 
         switch http.statusCode {
         case 200..<300:

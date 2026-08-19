@@ -84,6 +84,9 @@ struct SettingsView: View {
                     Button(model.isRedditConnected ? "Manage Reddit account" : "Connect Reddit") {
                         model.selectRoute(.redditAccount)
                     }
+                    Button("Privacy and data use") {
+                        model.selectRoute(.privacy)
+                    }
                     LabeledContent("Biometrics", value: model.biometricAvailabilityDescription)
                     LabeledContent("App lock", value: "Not implemented")
                         .foregroundStyle(.secondary)

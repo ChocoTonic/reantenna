@@ -19,6 +19,7 @@
 		52C542F40CC857671E9216C6 /* AntennaCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1AE2539D6F1253A23986C599 /* AntennaCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		55206C76817C4A8FB14485F7 /* AntennaCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AE2539D6F1253A23986C599 /* AntennaCore.framework */; };
 		66954387DF2462D37BD9B6D2 /* RedditService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3075361B0299FB0946961FBA /* RedditService.swift */; };
+		8266958C68C64C10283CA4FD /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFBA71CAA7443284FECF298 /* PrivacyView.swift */; };
 		82A33A9B6B0C9F78C08FBEEF /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22A677384D5E61D48EAE440 /* RootView.swift */; };
 		847B10AFD95F4D58BBDC439A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F5FBC5B839BB3849A99064 /* SettingsView.swift */; };
 		B82111845EF5AA349A670FA5 /* RedditOAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */; };
@@ -86,6 +87,7 @@
 		63F3CCC923E4C2D5882BDEB8 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		71F5FBC5B839BB3849A99064 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		85D6D7D3D02A4CA6B58F3392 /* RedditConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = RedditConfig.xcconfig; sourceTree = "<group>"; };
+		8FFBA71CAA7443284FECF298 /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
 		92C8C9943A7288D699AC26AE /* TopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBar.swift; sourceTree = "<group>"; };
 		92E618BDC44C294A6FF5F936 /* SwipeMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeMenuView.swift; sourceTree = "<group>"; };
 		94A7706BE9C4319FAF7AB68E /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				9B5938BBFCD6AC8162D8D9F5 /* Info.plist */,
 				09587CEB89AF6FFD75B63603 /* PlaceholderListingView.swift */,
 				94A7706BE9C4319FAF7AB68E /* PostDetailView.swift */,
+				8FFBA71CAA7443284FECF298 /* PrivacyView.swift */,
 				0B11AB9F63CE208B08494C7E /* ReAntennaApp.swift */,
 				48A865D645D1C90452C761F0 /* RedditAccountView.swift */,
 				C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */,
@@ -329,6 +332,7 @@
 				4C20CBAE15D43CA4A1C82DEE /* FeedView.swift in Sources */,
 				06C2563CCA295FE47699EA61 /* PlaceholderListingView.swift in Sources */,
 				4369D525D3CAC4F90E742A69 /* PostDetailView.swift in Sources */,
+				8266958C68C64C10283CA4FD /* PrivacyView.swift in Sources */,
 				FDBB720E754E38844BA2EF8E /* ReAntennaApp.swift in Sources */,
 				DCC8395E0B750A7819DE3E59 /* RedditAccountView.swift in Sources */,
 				B82111845EF5AA349A670FA5 /* RedditOAuthManager.swift in Sources */,
