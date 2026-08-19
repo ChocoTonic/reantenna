@@ -11,8 +11,7 @@ Last verified: 2026-08-18
   LocalDevVPN, showing a seven-day expiry and eight remaining weekly App IDs.
 - ReAntenna 0.1.0 (build 1) was built as an unsigned arm64 iPhoneOS IPA, installed
   through SideStore, and launched successfully on the physical phone.
-- ReAntenna 0.2.0 (build 2) adds the approval-gated read-only Reddit OAuth
-  foundation and has been packaged as an in-place update at
+- ReAntenna 0.2.0 (build 2) was packaged with the approval-gated Reddit OAuth foundation as an in-place update at
   `~/Library/Mobile Documents/com~apple~CloudDocs/Downloads/ReAntenna-0.2.0-build-2.ipa`.
   With no local client ID configured it intentionally remains in fixture mode.
 - Source bundle ID is `com.chocotonic.reantenna`. SideStore appends the signing
@@ -78,18 +77,14 @@ Do these in this order:
 - **Collapse Children** leaves every root comment visible and hides descendants;
   **Expand All** restores the tree.
 - Previous/next root-comment navigation and local Best/Top/New/Controversial sort.
-- Local post/comment actions for exercising the interface.
+- Fixture-mode post/comment actions for exercising the interface and approval-gated live actions for comment/reply, edit/delete of the user's own comments and self-text posts, vote, and save/unsave.
 - Persistent theme, layout, text, preview, cellular, browser, pagination, history,
   and cache preferences.
 - Viewed-item history persists and can be cleared; URL cache capacity and clearing
   work. Biometric hardware availability is reported honestly, but app lock is not
   implemented.
-- A replaceable `RedditService` boundary, `FixtureRedditService`, and the beginning
-  of an approval-gated `DataAPIRedditService`.
-- Installed-app OAuth authorization uses `ASWebAuthenticationSession`, a
-  cryptographically random and exactly validated `state`, permanent refresh
-  access, automatic refresh, revocation/logout, and this-device-only Keychain
-  storage. The app requests only `identity` and `read` initially.
+- A replaceable `RedditService` boundary, `FixtureRedditService`, and an approval-gated `DataAPIRedditService` for reads and the limited interactive writes disclosed in the access request.
+- Installed-app OAuth authorization uses `ASWebAuthenticationSession`, a cryptographically random and exactly validated `state`, permanent refresh access, automatic refresh, revocation/logout, and this-device-only Keychain storage. The requested initial scopes are `identity`, `read`, `submit`, `edit`, `vote`, and `save`. Submit is restricted to comments/replies; edit/delete is restricted to the authenticated user's own comments and self-text posts.
 - A Reddit Account screen reports the real connection state. If no approved local
   client configuration exists, the app honestly stays in fixture mode.
 - A public and in-app privacy policy describes collection, on-device storage,
@@ -101,11 +96,8 @@ Do these in this order:
 
 ### Build and CI state
 
-- The project builds and launches in the simulator and seven unit tests pass.
-- CI is configured to build/test every pull request and `main` push, but GitHub is
-  refusing to start any job because the account reports a failed payment or an
-  insufficient Actions spending limit. The owner must resolve **Settings → Billing
-  & plans**, or choose to make this repository public, before macOS jobs can run.
+- The project builds and launches in the simulator, with unit coverage for core behavior and Reddit write-request construction.
+- CI is configured to build/test every pull request and `main` push. If GitHub refuses to start a macOS job because the account reports a failed payment or insufficient Actions spending limit, the owner must resolve **Settings → Billing & plans**.
 - Main-branch simulator snapshots keep only the newest three artifacts.
 - Tags/commits preserve source for historical rebuilds; the snapshot workflow can
   rebuild any ref manually.
@@ -126,12 +118,12 @@ Do these in this order:
 - Validation of the installed-app OAuth flow against a newly approved client ID.
 - Live-read hardening after that validation, including explicit token-error parsing
   and recovery when Reddit invalidates a stored grant.
-- Complete listing/thread decoding, pagination, `more` comments, account switching,
-  API errors, rate-limit handling, retries, cache expiry, and deletion handling.
-- Real search, subreddit/user feeds, saved/hidden items, profile, inbox, voting,
-  saving, replying, submission, edit/delete, and moderation operations.
+- Complete listing/thread decoding, pagination, `more` comments, account switching, token-error recovery, retries, and deleted/quarantined-content handling.
+- Real search, user feeds, saved/hidden listings, profile, inbox, new-post submission,
+  reporting, hiding, subscriptions, and moderation operations. These need separate
+  scope and approval review where applicable.
 
-### Product work after live read-only data
+### Product work after approved live data
 
 - Real image, album, GIF/video, Reddit-video, YouTube, link-preview, and external
   browser pipelines.
@@ -206,9 +198,7 @@ If the approved flow directs you to `https://www.reddit.com/prefs/apps`, create 
 **Success looks like:** Reddit confirms approval and an installed-app entry has a
 client ID. An installed app has no client secret because a phone cannot keep one.
 
-**Important choices:** Request only the capabilities we implement. Start with
-identity and read access; add subreddit/vote/save/submit/private-message
-scopes only when those features are real. Use a User-Agent shaped like:
+**Important choices:** Request only the capabilities implemented for the first approved version: `identity`, `read`, `submit`, `edit`, `vote`, and `save`. Reddit's `submit` scope is required for comments and replies, but ReAntenna does not use it for new-post submission. Do not request private messages, moderation, reporting, hiding, or subscription changes. Use a User-Agent shaped like:
 
 ```text
 ios:com.chocotonic.reantenna:0.2.0 (by /u/YOUR_USERNAME)
@@ -226,20 +216,15 @@ Do not provide passwords, authorization codes, access tokens, or refresh tokens.
 
 ### R3 — configure and validate the implemented OAuth foundation
 
-The code for the callback URL scheme, authentication session, random `state`, code
-exchange, refresh, revocation/logout, Keychain storage, and read-only service switch
-is complete. After approval:
+The code for the callback URL scheme, authentication session, random `state`, code exchange, refresh, revocation/logout, Keychain storage, reading, and user-initiated comment/reply, edit/delete of the user's own comments and self-text posts, vote, and save/unsave operations is prepared. Live behavior still requires validation after approval:
 
 1. Copy `Config/Reddit.local.example.xcconfig` to the ignored
    `Config/Reddit.local.xcconfig`.
 2. Set `REDDIT_CLIENT_ID` and `REDDIT_DEVELOPER_USERNAME`; do not set a secret.
 3. Run `xcodegen generate`, rebuild the IPA, and update it in SideStore.
-4. Open **Menu → Reddit Account → Connect Reddit**, approve the three displayed
-   read-only scopes, and confirm the screen shows `u/YOUR_USERNAME`.
-5. Verify a live front page and thread load, relaunch the app to exercise token
-   restoration, then disconnect and verify local credentials are gone.
-6. Only after this succeeds, implement write operations one family at a time and
-   add their scopes deliberately.
+4. Open **Menu → Reddit Account → Connect Reddit**, verify the consent page lists exactly `identity`, `read`, `submit`, `edit`, `vote`, and `save`, then confirm the screen shows `u/YOUR_USERNAME`.
+5. Verify a live feed and thread load. Test comment/reply, editing and deleting only the authenticated user's own comment or self-text post, voting, and save/unsave one at a time; confirm each API failure is surfaced instead of being shown as success.
+6. Relaunch the app to exercise token restoration, then disconnect and verify local credentials are gone. Do not add other scopes or operations without updating the implementation, privacy policy, and Reddit approval.
 
 The old Antenna client ID, cookies, bearer tokens, and refresh tokens are forbidden.
 

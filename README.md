@@ -9,7 +9,7 @@ The project is independently written and uses original assets. It recreates Ante
 - Dense, thumbnail, and grid feeds
 - Light, dark, and system appearance
 - Read, saved, vote, score, metadata, flair, domain, and NSFW row states
-- Short row swipe for vote/save/hide actions
+- Short row swipe for vote and save actions
 - Long swipe from anywhere to open the right-side menu
 - Swipe right from anywhere to navigate back
 - Right-side shortcuts/general/accounts/user menu modeled from surviving Antenna screenshots
@@ -21,13 +21,14 @@ The project is independently written and uses original assets. It recreates Ante
 - Optional collapse-all-child-comments default for every newly opened thread
 - Previous/next root-comment navigation
 - Optional next-post control
+- Manual navigation to validated public subreddit feeds
 - Long-press post/comment action menus
 - Persistent layout, theme, link-preview, history, navigation, and text-size preferences
 - Replaceable `RedditService` boundary
 - Fixture service and platform-neutral core smoke checks
 - Approval-gated installed-app OAuth flow with state validation, refresh, revocation,
   and Keychain token storage
-- Read-only live Reddit service activation with automatic fixture fallback
+- Approval-gated live Reddit service with user-initiated comment/reply, edit/delete of the user's own comments and self-text posts, vote, and save/unsave operations, plus automatic fixture fallback
 
 ## Open the project
 
@@ -61,12 +62,7 @@ The normal `AntennaCoreTests` XCTest target is included, but Apple's standalone 
 
 ## Continuous integration and builds
 
-GitHub Actions is configured to build and test on a pinned macOS runner. Main-branch
-simulator snapshots retain only the newest three artifacts, while Git tags retain
-the source needed to rebuild any older version. A manual workflow accepts any tag,
-branch, or commit SHA for historical rebuilds. Runs are presently blocked at the
-account level by GitHub billing/spending settings for macOS runners; no job step is
-starting until that owner setting is resolved or the repository becomes public.
+GitHub Actions is configured to build and test on a pinned macOS runner. Main-branch simulator snapshots retain only the newest three artifacts, while Git tags retain the source needed to rebuild any older version. A manual workflow accepts any tag, branch, or commit SHA for historical rebuilds. If GitHub refuses to start a macOS job because of account billing or spending settings, the repository owner must resolve that account-level restriction.
 
 See [docs/RELEASING.md](docs/RELEASING.md) for the retention policy, free Personal
 Team limitation, and optional signed-build secrets.
@@ -97,13 +93,18 @@ Enter only the installed-app client ID and your Reddit username. Do not add a
 client secret: an installed/native app does not have one. The local file is ignored
 by Git. Reddit must register the callback exactly as `reantenna://oauth`.
 
-The intended live implementation is `DataAPIRedditService`, conforming to the same protocol:
+The intended live implementation is `DataAPIRedditService`, conforming to the same protocol. Its read methods are joined by authenticated, user-initiated methods for commenting, editing or deleting the user's own comments and self-text posts, voting, and saving or unsaving:
 
 ```swift
 public protocol RedditService: Sendable {
     func posts(in feed: String, sort: FeedSort) async throws -> [Post]
     func thread(id: String) async throws -> ThreadPage
     func accounts() async -> [AccountSummary]
+    func submitComment(parentFullName: String, text: String) async throws -> String
+    func editText(fullName: String, text: String) async throws
+    func deleteText(fullName: String) async throws
+    func vote(fullName: String, direction: VoteState) async throws
+    func setSaved(fullName: String, isSaved: Bool) async throws
 }
 ```
 
@@ -115,18 +116,9 @@ ReAntenna is available under the [MIT License](LICENSE).
 
 ## What works today
 
-ReAntenna is currently an interaction prototype with a completed read-only OAuth
-foundation, but it cannot be validated as a live Reddit client until Reddit approves
-and issues a client ID. Without that local configuration, the feed, sorting, layouts,
-swipe navigation, appearance preferences, thread traversal, and comment collapse controls
-operate against deterministic fixtures. In particular, **Collapse
-Children** keeps every root comment visible while hiding all of its descendants, matching
-the Antenna workflow this reconstruction is intended to preserve.
+ReAntenna is currently an interaction prototype with an approval-gated OAuth and Data API foundation, but live behavior cannot be validated until Reddit approves and issues a client ID. Without that local configuration, the feed, sorting, layouts, swipe navigation, appearance preferences, thread traversal, comment collapse controls, and action feedback operate against deterministic fixtures. In particular, **Collapse Children** keeps every root comment visible while hiding all descendants.
 
-Actions that require an authenticated Reddit account—voting, replying, saving remotely,
-inbox, profile, and submission—must remain unavailable until a separately registered and
-approved OAuth client is connected. The UI should never imply that one of those actions
-succeeded merely because fixture state changed.
+The initial live scope is deliberately limited to reading plus manually initiated comment/reply, editing or deleting the user's own comments and self-text posts, voting, and saving or unsaving. New-post submission, private messages, moderation, reporting, hiding, subreddit subscription changes, automation, and background writes are not included. The UI must display API success or failure and must never imply that a live action succeeded merely because local state changed.
 
 The implementation status and historical evidence are tracked in `RESEARCH.md`. Surviving
 screenshots and the developer-maintained Antenna FAQ are treated as the visual and

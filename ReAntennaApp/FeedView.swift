@@ -47,10 +47,25 @@ struct FeedView: View {
                 ProgressView("Loading \(model.selectedFeed)…")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                feed
+                VStack(spacing: 0) {
+                    if model.isUsingFixtureData {
+                        Label("Fixture data — actions are local previews", systemImage: "shippingbox")
+                            .font(.system(size: 9.5, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                            .background(AppTheme.secondaryBackground)
+                    }
+                    feed
+                }
             }
         }
         .background(Color.reAntennaBackground)
+        .alert("Reddit action failed", isPresented: writeErrorPresented) {
+            Button("OK", role: .cancel) { model.writeErrorMessage = nil }
+        } message: {
+            Text(model.writeErrorMessage ?? "Unknown error")
+        }
     }
 
     @ViewBuilder
@@ -78,25 +93,38 @@ struct FeedView: View {
                             textScale: model.preferences.textScale,
                             open: { model.openPost(post) },
                             vote: { direction in
-                                model.updatePost(id: post.id) { item in
-                                    let old = item.vote.rawValue
-                                    item.vote = direction
-                                    item.score += direction.rawValue - old
+                                Task {
+                                    let requested = post.vote == direction ? VoteState.none : direction
+                                    guard await model.vote(fullname: "t3_\(post.id)", direction: requested) else { return }
+                                    model.updatePost(id: post.id) { item in
+                                        let old = item.vote.rawValue
+                                        item.vote = requested
+                                        item.score += requested.rawValue - old
+                                    }
                                 }
                             },
                             toggleSaved: {
-                                model.updatePost(id: post.id) { $0.isSaved.toggle() }
+                                Task {
+                                    let requested = !post.isSaved
+                                    guard await model.setSaved(fullname: "t3_\(post.id)", isSaved: requested) else { return }
+                                    model.updatePost(id: post.id) { $0.isSaved = requested }
+                                }
                             },
-                            hide: {
-                                withAnimation { model.updatePost(id: post.id) { $0.isHidden = true } }
-                                Task { await model.refresh() }
-                            }
+                            isVotePending: model.isWritePending("vote:t3_\(post.id)"),
+                            isSavePending: model.isWritePending("save:t3_\(post.id)")
                         )
                     }
                 }
             }
             .refreshable { await model.refresh() }
         }
+    }
+
+    private var writeErrorPresented: Binding<Bool> {
+        Binding(
+            get: { model.writeErrorMessage != nil },
+            set: { if !$0 { model.writeErrorMessage = nil } }
+        )
     }
 
     private var layoutIcon: String {
@@ -123,12 +151,13 @@ private struct DensePostRow: View {
     let open: () -> Void
     let vote: (VoteState) -> Void
     let toggleSaved: () -> Void
-    let hide: () -> Void
+    let isVotePending: Bool
+    let isSavePending: Bool
 
     @State private var isActionsOpen = false
     @State private var dragOffset: CGFloat = 0
 
-    private let actionsWidth: CGFloat = 174
+    private let actionsWidth: CGFloat = 116
 
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -213,14 +242,12 @@ private struct DensePostRow: View {
                 vote(.up)
                 closeActions()
             }
+            .disabled(isVotePending)
             actionButton(post.isSaved ? "bookmark.slash" : "bookmark", color: AppTheme.mutedBlue) {
                 toggleSaved()
                 closeActions()
             }
-            actionButton("eye.slash", color: .gray) {
-                hide()
-                closeActions()
-            }
+            .disabled(isSavePending)
         }
         .frame(width: actionsWidth)
     }
@@ -238,12 +265,16 @@ private struct DensePostRow: View {
 
     @ViewBuilder
     private var contextActions: some View {
-        Button("Upvote", systemImage: "arrow.up") { vote(.up) }
-        Button("Downvote", systemImage: "arrow.down") { vote(.down) }
-        Button(post.isSaved ? "Unsave" : "Save", systemImage: "bookmark") { toggleSaved() }
-        Button("Share", systemImage: "square.and.arrow.up") {}
-        Button("Filter this", systemImage: "line.3.horizontal.decrease.circle") {}
-        Button("Hide", systemImage: "eye.slash", role: .destructive) { hide() }
+        Button("Upvote", systemImage: "arrow.up") { vote(.up) }.disabled(isVotePending)
+        Button("Downvote", systemImage: "arrow.down") { vote(.down) }.disabled(isVotePending)
+        Button(post.isSaved ? "Unsave" : "Save", systemImage: "bookmark") { toggleSaved() }.disabled(isSavePending)
+        ShareLink(
+            item: redditURL,
+            subject: Text(post.title),
+            message: Text(post.title)
+        ) {
+            Label("Share", systemImage: "square.and.arrow.up")
+        }
     }
 
     private var rowSwipe: some Gesture {
@@ -271,6 +302,10 @@ private struct DensePostRow: View {
 
     private func closeActions() {
         withAnimation(.snappy) { isActionsOpen = false }
+    }
+
+    private var redditURL: URL {
+        URL(string: "https://www.reddit.com/comments/\(post.id)")!
     }
 }
 

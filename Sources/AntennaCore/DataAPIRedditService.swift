@@ -36,12 +36,17 @@ public struct RedditRateLimit: Hashable, Sendable {
 public actor DataAPIRedditService: RedditService {
     public typealias AccessTokenProvider = @Sendable () async throws -> String
 
+    private struct RequestReservation {
+        let id: UUID
+        let time: Date
+    }
+
     private let configuration: RedditAPIConfiguration
     private let tokenProvider: AccessTokenProvider
     private let account: AccountSummary
     private let session: URLSession
     private var rateLimitBlockedUntil: Date?
-    private var recentRequestTimes: [Date] = []
+    private var recentRequests: [RequestReservation] = []
 
     public private(set) var lastRateLimit: RedditRateLimit?
 
@@ -113,36 +118,144 @@ public actor DataAPIRedditService: RedditService {
         [account]
     }
 
+    @discardableResult
+    public func submitComment(parentFullName: String, text: String) async throws -> String {
+        let parent = try validatedFullName(parentFullName)
+        let body = try validatedText(text)
+        let response: RedditJSONResponse = try await post(
+            path: "/api/comment",
+            form: [
+                URLQueryItem(name: "api_type", value: "json"),
+                URLQueryItem(name: "return_rtjson", value: "false"),
+                URLQueryItem(name: "text", value: body),
+                URLQueryItem(name: "thing_id", value: parent),
+            ]
+        )
+        try response.throwFirstError()
+        guard let fullName = response.json.data?.things?.first?.data.name, !fullName.isEmpty else {
+            throw RedditServiceError.unavailable
+        }
+        return fullName
+    }
+
+    public func editText(fullName: String, text: String) async throws {
+        let response: RedditJSONResponse = try await post(
+            path: "/api/editusertext",
+            form: [
+                URLQueryItem(name: "api_type", value: "json"),
+                URLQueryItem(name: "text", value: try validatedText(text)),
+                URLQueryItem(name: "thing_id", value: try validatedFullName(fullName)),
+            ]
+        )
+        try response.throwFirstError()
+    }
+
+    public func deleteText(fullName: String) async throws {
+        try await postWithoutResponse(
+            path: "/api/del",
+            form: [URLQueryItem(name: "id", value: try validatedFullName(fullName))]
+        )
+    }
+
+    public func vote(fullName: String, direction: VoteState) async throws {
+        let dir: String
+        switch direction {
+        case .up: dir = "1"
+        case .none: dir = "0"
+        case .down: dir = "-1"
+        }
+        try await postWithoutResponse(
+            path: "/api/vote",
+            form: [
+                URLQueryItem(name: "dir", value: dir),
+                URLQueryItem(name: "id", value: try validatedFullName(fullName)),
+            ]
+        )
+    }
+
+    public func setSaved(fullName: String, isSaved: Bool) async throws {
+        try await postWithoutResponse(
+            path: isSaved ? "/api/save" : "/api/unsave",
+            form: [URLQueryItem(name: "id", value: try validatedFullName(fullName))]
+        )
+    }
+
     private func request<Response: Decodable>(
         path: String,
         query: [URLQueryItem]
     ) async throws -> Response {
+        let data = try await perform(path: path, query: query, method: "GET", body: nil)
+        do {
+            return try JSONDecoder().decode(Response.self, from: data)
+        } catch {
+            throw RedditServiceError.unavailable
+        }
+    }
+
+    private func post<Response: Decodable>(
+        path: String,
+        form: [URLQueryItem]
+    ) async throws -> Response {
+        var encoder = URLComponents()
+        encoder.queryItems = form
+        guard let encoded = encoder.percentEncodedQuery?.data(using: .utf8) else {
+            throw RedditServiceError.invalidRequest("The request could not be encoded.")
+        }
+        let data = try await perform(path: path, query: [], method: "POST", body: encoded)
+        do {
+            return try JSONDecoder().decode(Response.self, from: data)
+        } catch {
+            throw RedditServiceError.unavailable
+        }
+    }
+
+    private func postWithoutResponse(path: String, form: [URLQueryItem]) async throws {
+        var encoder = URLComponents()
+        encoder.queryItems = form
+        guard let encoded = encoder.percentEncodedQuery?.data(using: .utf8) else {
+            throw RedditServiceError.invalidRequest("The request could not be encoded.")
+        }
+        _ = try await perform(path: path, query: [], method: "POST", body: encoded)
+    }
+
+    private func perform(
+        path: String,
+        query: [URLQueryItem],
+        method: String,
+        body: Data?
+    ) async throws -> Data {
         guard configuration.isUsable else { throw RedditServiceError.unauthorized }
-        if let blockedUntil = rateLimitBlockedUntil, blockedUntil > Date() {
-            throw RedditServiceError.rateLimited(retryAfter: blockedUntil.timeIntervalSinceNow)
-        }
-        let now = Date()
-        recentRequestTimes.removeAll { now.timeIntervalSince($0) >= 60 }
-        if recentRequestTimes.count >= 60, let oldest = recentRequestTimes.first {
-            throw RedditServiceError.rateLimited(
-                retryAfter: max(1, 60 - now.timeIntervalSince(oldest))
-            )
-        }
 
         var components = URLComponents()
         components.scheme = "https"
         components.host = "oauth.reddit.com"
         components.path = path
-        components.queryItems = query
+        if !query.isEmpty {
+            components.queryItems = query
+        }
         guard let url = components.url else { throw RedditServiceError.unavailable }
 
-        let token = try await tokenProvider()
+        // Reserve before the first suspension. Actor methods are reentrant, so
+        // checking here but appending after token acquisition would allow a
+        // burst of concurrent calls to all observe the same available slot.
+        let reservationID = try reserveRequestSlot()
+        let token: String
+        do {
+            token = try await tokenProvider()
+        } catch {
+            cancelRequestReservation(reservationID)
+            throw error
+        }
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
+        request.httpMethod = method
+        request.httpBody = body
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue(configuration.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if body != nil {
+            request.setValue("application/x-www-form-urlencoded; charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        }
 
-        recentRequestTimes.append(now)
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else {
             throw RedditServiceError.unavailable
@@ -161,20 +274,112 @@ public actor DataAPIRedditService: RedditService {
            resetAfter > 0
         {
             rateLimitBlockedUntil = Date().addingTimeInterval(resetAfter)
-        } else {
-            rateLimitBlockedUntil = nil
         }
 
         switch http.statusCode {
         case 200..<300:
-            return try JSONDecoder().decode(Response.self, from: data)
-        case 401, 403:
+            return data
+        case 401:
             throw RedditServiceError.unauthorized
+        case 403:
+            throw RedditServiceError.forbidden
         case 429:
             throw RedditServiceError.rateLimited(retryAfter: lastRateLimit?.resetAfter ?? 60)
         default:
             throw RedditServiceError.unavailable
         }
+    }
+
+    private func reserveRequestSlot() throws -> UUID {
+        let now = Date()
+        if let blockedUntil = rateLimitBlockedUntil {
+            if blockedUntil > now {
+                throw RedditServiceError.rateLimited(
+                    retryAfter: max(1, blockedUntil.timeIntervalSince(now))
+                )
+            }
+            rateLimitBlockedUntil = nil
+        }
+
+        recentRequests.removeAll { now.timeIntervalSince($0.time) >= 60 }
+        if recentRequests.count >= 60, let oldest = recentRequests.first {
+            throw RedditServiceError.rateLimited(
+                retryAfter: max(1, 60 - now.timeIntervalSince(oldest.time))
+            )
+        }
+
+        let id = UUID()
+        recentRequests.append(RequestReservation(id: id, time: now))
+        return id
+    }
+
+    private func cancelRequestReservation(_ id: UUID) {
+        recentRequests.removeAll { $0.id == id }
+    }
+
+    private func validatedFullName(_ value: String) throws -> String {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.range(of: #"^t[13]_[A-Za-z0-9]+$"#, options: .regularExpression) != nil else {
+            throw RedditServiceError.invalidRequest("A post or comment fullname is required.")
+        }
+        return trimmed
+    }
+
+    private func validatedText(_ value: String) throws -> String {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw RedditServiceError.invalidRequest("Comment text cannot be empty.")
+        }
+        return trimmed
+    }
+}
+
+private struct RedditJSONResponse: Decodable {
+    let json: JSONBody
+
+    struct JSONBody: Decodable {
+        let errors: [[JSONValue]]
+        let data: ResponseData?
+    }
+
+    struct ResponseData: Decodable {
+        let things: [ResponseThing]?
+    }
+
+    struct ResponseThing: Decodable {
+        let data: ThingData
+    }
+
+    struct ThingData: Decodable {
+        let name: String?
+    }
+
+    func throwFirstError() throws {
+        guard let error = json.errors.first else { return }
+        let code = error.first?.stringValue ?? "UNKNOWN"
+        let message = error.dropFirst().first?.stringValue ?? "Reddit rejected the request."
+        throw RedditServiceError.apiError(code: code, message: message)
+    }
+}
+
+private enum JSONValue: Decodable {
+    case string(String)
+    case number(Double)
+    case boolean(Bool)
+    case null
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() { self = .null }
+        else if let value = try? container.decode(String.self) { self = .string(value) }
+        else if let value = try? container.decode(Double.self) { self = .number(value) }
+        else if let value = try? container.decode(Bool.self) { self = .boolean(value) }
+        else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unsupported JSON value") }
+    }
+
+    var stringValue: String? {
+        guard case let .string(value) = self else { return nil }
+        return value
     }
 }
 

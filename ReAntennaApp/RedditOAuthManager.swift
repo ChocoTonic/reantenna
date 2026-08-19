@@ -26,7 +26,9 @@ enum RedditOAuthError: LocalizedError {
     case invalidCallback
     case stateMismatch
     case accessDenied
+    case reauthorizationRequired
     case tokenRejected
+    case rateLimited
     case unavailable
 
     var errorDescription: String? {
@@ -41,8 +43,12 @@ enum RedditOAuthError: LocalizedError {
             "The Reddit sign-in response failed its security check."
         case .accessDenied:
             "Reddit access was not granted."
+        case .reauthorizationRequired:
+            "Reddit permissions have changed. Reconnect Reddit to grant identity, read, submit, edit, vote, and save access."
         case .tokenRejected:
             "Reddit rejected the authorization token. Check the client ID and redirect URI."
+        case .rateLimited:
+            "Reddit temporarily limited requests. Wait for the reset interval, then try again."
         case .unavailable:
             "Reddit is unavailable. Try again later."
         }
@@ -62,7 +68,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         let accessToken: String
         let refreshToken: String?
         let expiresIn: TimeInterval
-        let scope: String
+        let scope: String?
 
         enum CodingKeys: String, CodingKey {
             case accessToken = "access_token"
@@ -87,7 +93,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
 
     private let callbackScheme = "reantenna"
     private let redirectURI = "reantenna://oauth"
-    private let scopes = ["identity", "read"]
+    private let scopes = RedditOAuthScopePolicy.requiredScopes
     private let keychain = RedditCredentialKeychain()
     private let session: URLSession
     private var credential: StoredCredential?
@@ -152,11 +158,12 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
 
     func restoreAccount() async throws -> AccountSummary? {
         guard isConfigured, credential != nil else { return nil }
+        _ = try validatedCredential()
         return try await fetchIdentity()
     }
 
     func validAccessToken() async throws -> String {
-        guard var credential else { throw RedditServiceError.unauthorized }
+        var credential = try validatedCredential()
         if credential.expiresAt.timeIntervalSinceNow > 60 {
             return credential.accessToken
         }
@@ -173,8 +180,11 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         credential.accessToken = refreshed.accessToken
         credential.refreshToken = refreshed.refreshToken ?? refreshToken
         credential.expiresAt = Date().addingTimeInterval(refreshed.expiresIn)
-        credential.scope = refreshed.scope
+        if let refreshedScope = refreshed.scope, !refreshedScope.isEmpty {
+            credential.scope = refreshedScope
+        }
         self.credential = credential
+        _ = try validatedCredential()
         try keychain.save(credential)
         return credential.accessToken
     }
@@ -268,7 +278,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
             accessToken: token.accessToken,
             refreshToken: token.refreshToken,
             expiresAt: Date().addingTimeInterval(token.expiresIn),
-            scope: token.scope
+            scope: token.scope ?? ""
         )
     }
 
@@ -287,6 +297,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
 
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw RedditOAuthError.unavailable }
+        if http.statusCode == 429 { throw RedditOAuthError.rateLimited }
         guard (200..<300).contains(http.statusCode) else { throw RedditOAuthError.tokenRejected }
         return try JSONDecoder().decode(TokenResponse.self, from: data)
     }
@@ -301,6 +312,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         request.setValue(apiConfiguration?.userAgent, forHTTPHeaderField: "User-Agent")
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw RedditOAuthError.unavailable }
+        if http.statusCode == 429 { throw RedditOAuthError.rateLimited }
         guard (200..<300).contains(http.statusCode) else { throw RedditOAuthError.tokenRejected }
         let identity = try JSONDecoder().decode(IdentityResponse.self, from: data)
         return AccountSummary(
@@ -316,6 +328,7 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("Basic \(Data("\(clientID):".utf8).base64EncodedString())", forHTTPHeaderField: "Authorization")
+        request.setValue(apiConfiguration?.userAgent, forHTTPHeaderField: "User-Agent")
         var components = URLComponents()
         components.queryItems = [URLQueryItem(name: "token", value: token)]
         request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
@@ -331,6 +344,16 @@ final class RedditOAuthManager: NSObject, ASWebAuthenticationPresentationContext
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
+    }
+
+    private func validatedCredential() throws -> StoredCredential {
+        guard let credential else { throw RedditServiceError.unauthorized }
+        guard !RedditOAuthScopePolicy.requiresReauthorization(grantedScope: credential.scope) else {
+            self.credential = nil
+            keychain.delete()
+            throw RedditOAuthError.reauthorizationRequired
+        }
+        return credential
     }
 }
 

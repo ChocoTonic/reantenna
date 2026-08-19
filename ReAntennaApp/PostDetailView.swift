@@ -24,6 +24,12 @@ struct PostDetailView: View {
                 .buttonStyle(.plain)
             }
 
+            if let message = model.writeErrorMessage {
+                WriteErrorBanner(message: message) {
+                    model.writeErrorMessage = nil
+                }
+            }
+
             Group {
                 if let page {
                     thread(page)
@@ -48,7 +54,15 @@ struct PostDetailView: View {
         return ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    PostHeader(post: page.post)
+                    if model.isUsingFixtureData {
+                        Label("Fixture data — replies and actions are local previews", systemImage: "shippingbox")
+                            .font(.system(size: 9.5, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                            .background(AppTheme.secondaryBackground)
+                    }
+                    PostHeader(post: page.post, onReload: load)
                     commentControls(comments)
 
                     ForEach(visibleComments(from: comments)) { item in
@@ -56,7 +70,8 @@ struct PostDetailView: View {
                             item: item,
                             isCollapsed: collapsedIDs.contains(item.id),
                             quickTapCollapses: model.preferences.quickTapCollapsesComments,
-                            toggleCollapsed: { toggleCollapsed(item.comment) }
+                            toggleCollapsed: { toggleCollapsed(item.comment) },
+                            onReload: load
                         )
                         .id(item.id)
                     }
@@ -262,14 +277,17 @@ private enum CommentSort: String, CaseIterable, Identifiable {
 
 private struct PostHeader: View {
     let post: Post
+    let onReload: () async -> Void
 
+    @EnvironmentObject private var model: AppModel
     @State private var vote: VoteState
     @State private var isSaved: Bool
-    @State private var isHidden = false
-    @State private var showsReply = false
+    @State private var composer: PostComposer?
+    @State private var confirmsDeletion = false
 
-    init(post: Post) {
+    init(post: Post, onReload: @escaping () async -> Void) {
         self.post = post
+        self.onReload = onReload
         _vote = State(initialValue: post.vote)
         _isSaved = State(initialValue: post.isSaved)
     }
@@ -279,7 +297,7 @@ private struct PostHeader: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(post.title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(isHidden ? .secondary : .primary)
+                    .foregroundStyle(.primary)
                 HStack(spacing: 4) {
                     Text("r/\(post.subreddit)")
                         .foregroundStyle(AppTheme.purple)
@@ -297,23 +315,41 @@ private struct PostHeader: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(8)
                     .background(AppTheme.secondaryBackground)
-            } else if !isHidden {
+            } else {
                 PostHero(kind: post.kind)
             }
 
             HStack(spacing: 0) {
-                postAction(vote == .up ? "arrow.up.circle.fill" : "arrow.up", label: "Upvote", color: vote == .up ? AppTheme.orange : .secondary) {
-                    vote = vote == .up ? .none : .up
+                postAction(
+                    vote == .up ? "arrow.up.circle.fill" : "arrow.up",
+                    label: "Upvote",
+                    color: vote == .up ? AppTheme.orange : .secondary,
+                    isDisabled: model.isWritePending("vote:t3_\(post.id)")
+                ) {
+                    Task { await changeVote(to: vote == .up ? .none : .up) }
                 }
-                postAction(vote == .down ? "arrow.down.circle.fill" : "arrow.down", label: "Downvote", color: vote == .down ? AppTheme.mutedBlue : .secondary) {
-                    vote = vote == .down ? .none : .down
+                postAction(
+                    vote == .down ? "arrow.down.circle.fill" : "arrow.down",
+                    label: "Downvote",
+                    color: vote == .down ? AppTheme.mutedBlue : .secondary,
+                    isDisabled: model.isWritePending("vote:t3_\(post.id)")
+                ) {
+                    Task { await changeVote(to: vote == .down ? .none : .down) }
                 }
                 Text(adjustedScore.abbreviated)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(vote == .up ? AppTheme.orange : vote == .down ? AppTheme.mutedBlue : .secondary)
                     .frame(minWidth: 34)
-                postAction("bubble.left", label: "Reply") { showsReply = true }
-                ShareLink(item: post.title) {
+                postAction(
+                    "bubble.left",
+                    label: "Reply",
+                    isDisabled: model.isWritePending("comment:t3_\(post.id)")
+                ) { composer = .reply }
+                ShareLink(
+                    item: redditURL,
+                    subject: Text(post.title),
+                    message: Text(post.title)
+                ) {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 14))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -322,10 +358,14 @@ private struct PostHeader: View {
                 .accessibilityLabel("Share")
                 Menu {
                     Button(isSaved ? "Unsave" : "Save", systemImage: isSaved ? "bookmark.slash" : "bookmark") {
-                        isSaved.toggle()
+                        Task { await changeSaved(to: !isSaved) }
                     }
-                    Button(isHidden ? "Show post" : "Hide post", systemImage: isHidden ? "eye" : "eye.slash") {
-                        isHidden.toggle()
+                    .disabled(model.isWritePending("save:t3_\(post.id)"))
+                    if isOwnPost, post.kind == .text {
+                        Button("Edit", systemImage: "pencil") { composer = .edit }
+                            .disabled(model.isWritePending("edit:t3_\(post.id)"))
+                        Button("Delete", systemImage: "trash", role: .destructive) { confirmsDeletion = true }
+                            .disabled(model.isWritePending("delete:t3_\(post.id)"))
                     }
                 } label: {
                     Image(systemName: isSaved ? "bookmark.fill" : "ellipsis")
@@ -336,11 +376,42 @@ private struct PostHeader: View {
             .frame(height: 33)
             .background(AppTheme.secondaryBackground)
         }
-        .sheet(isPresented: $showsReply) {
-            ReplyComposer(title: "Reply to u/\(post.author)")
+        .sheet(item: $composer) { composer in
+            switch composer {
+            case .reply:
+                ReplyComposer(title: "Reply to u/\(post.author)") { text in
+                    guard await model.submitComment(parentFullname: "t3_\(post.id)", text: text) else { return false }
+                    await onReload()
+                    return true
+                }
+            case .edit:
+                ReplyComposer(title: "Edit post", initialText: post.body ?? "", sendLabel: "Save") { text in
+                    guard await model.edit(fullname: "t3_\(post.id)", text: text) else { return false }
+                    await onReload()
+                    return true
+                }
+            }
+        }
+        .confirmationDialog("Delete this post?", isPresented: $confirmsDeletion, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    guard await model.delete(fullname: "t3_\(post.id)") else { return }
+                    model.goBack()
+                    await model.refresh()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This permanently removes the post from Reddit.")
         }
         .overlay(alignment: .bottom) {
             Rectangle().fill(AppTheme.separator).frame(height: 0.5)
+        }
+        .onChange(of: post.vote) { _, refreshedVote in
+            vote = refreshedVote
+        }
+        .onChange(of: post.isSaved) { _, refreshedSavedState in
+            isSaved = refreshedSavedState
         }
     }
 
@@ -348,10 +419,34 @@ private struct PostHeader: View {
         post.score + vote.rawValue - post.vote.rawValue
     }
 
+    private var isOwnPost: Bool {
+        guard let username = previewOrConnectedUsername else { return false }
+        return username.caseInsensitiveCompare(post.author) == .orderedSame
+    }
+
+    private var previewOrConnectedUsername: String? {
+        model.connectedRedditUsername ?? (model.isUsingFixtureData ? "local_reader" : nil)
+    }
+
+    private var redditURL: URL {
+        URL(string: "https://www.reddit.com/comments/\(post.id)")!
+    }
+
+    private func changeVote(to requested: VoteState) async {
+        guard await model.vote(fullname: "t3_\(post.id)", direction: requested) else { return }
+        vote = requested
+    }
+
+    private func changeSaved(to requested: Bool) async {
+        guard await model.setSaved(fullname: "t3_\(post.id)", isSaved: requested) else { return }
+        isSaved = requested
+    }
+
     private func postAction(
         _ icon: String,
         label: String,
         color: Color = .secondary,
+        isDisabled: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -361,8 +456,16 @@ private struct PostHeader: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .buttonStyle(.plain)
+        .disabled(isDisabled)
         .accessibilityLabel(label)
     }
+}
+
+private enum PostComposer: String, Identifiable {
+    case reply
+    case edit
+
+    var id: String { rawValue }
 }
 
 private struct PostHero: View {
@@ -409,22 +512,27 @@ private struct CommentRow: View {
     let isCollapsed: Bool
     let quickTapCollapses: Bool
     let toggleCollapsed: () -> Void
+    let onReload: () async -> Void
 
+    @EnvironmentObject private var model: AppModel
     @State private var vote: VoteState
-    @State private var showsReply = false
+    @State private var composer: CommentComposer?
     @State private var isFiltered = false
     @State private var copied = false
+    @State private var confirmsDeletion = false
 
     init(
         item: VisibleComment,
         isCollapsed: Bool,
         quickTapCollapses: Bool,
-        toggleCollapsed: @escaping () -> Void
+        toggleCollapsed: @escaping () -> Void,
+        onReload: @escaping () async -> Void
     ) {
         self.item = item
         self.isCollapsed = isCollapsed
         self.quickTapCollapses = quickTapCollapses
         self.toggleCollapsed = toggleCollapsed
+        self.onReload = onReload
         _vote = State(initialValue: item.comment.vote)
     }
 
@@ -483,9 +591,21 @@ private struct CommentRow: View {
         }
         .contextMenu {
             Button(vote == .up ? "Remove upvote" : "Upvote", systemImage: "arrow.up") {
-                vote = vote == .up ? .none : .up
+                Task { await changeVote(to: vote == .up ? .none : .up) }
             }
-            Button("Reply", systemImage: "arrowshape.turn.up.left") { showsReply = true }
+            .disabled(model.isWritePending("vote:t1_\(item.comment.id)"))
+            Button(vote == .down ? "Remove downvote" : "Downvote", systemImage: "arrow.down") {
+                Task { await changeVote(to: vote == .down ? .none : .down) }
+            }
+            .disabled(model.isWritePending("vote:t1_\(item.comment.id)"))
+            Button("Reply", systemImage: "arrowshape.turn.up.left") { composer = .reply }
+                .disabled(model.isWritePending("comment:t1_\(item.comment.id)"))
+            if isOwnComment {
+                Button("Edit", systemImage: "pencil") { composer = .edit }
+                    .disabled(model.isWritePending("edit:t1_\(item.comment.id)"))
+                Button("Delete", systemImage: "trash", role: .destructive) { confirmsDeletion = true }
+                    .disabled(model.isWritePending("delete:t1_\(item.comment.id)"))
+            }
             if !item.comment.children.isEmpty {
                 Button(isCollapsed ? "Expand" : "Collapse", systemImage: isCollapsed ? "rectangle.expand.vertical" : "rectangle.compress.vertical") {
                     toggleCollapsed()
@@ -496,16 +616,54 @@ private struct CommentRow: View {
                 isFiltered.toggle()
             }
         }
-        .sheet(isPresented: $showsReply) {
-            ReplyComposer(title: "Reply to u/\(item.comment.author)")
+        .sheet(item: $composer) { composer in
+            switch composer {
+            case .reply:
+                ReplyComposer(title: "Reply to u/\(item.comment.author)") { text in
+                    guard await model.submitComment(parentFullname: "t1_\(item.comment.id)", text: text) else { return false }
+                    await onReload()
+                    return true
+                }
+            case .edit:
+                ReplyComposer(title: "Edit comment", initialText: item.comment.body, sendLabel: "Save") { text in
+                    guard await model.edit(fullname: "t1_\(item.comment.id)", text: text) else { return false }
+                    await onReload()
+                    return true
+                }
+            }
+        }
+        .confirmationDialog("Delete this comment?", isPresented: $confirmsDeletion, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    guard await model.delete(fullname: "t1_\(item.comment.id)") else { return }
+                    await onReload()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This permanently removes the comment from Reddit.")
         }
         .overlay(alignment: .bottom) {
             Rectangle().fill(AppTheme.separator).frame(height: 0.5)
+        }
+        .onChange(of: item.comment.vote) { _, refreshedVote in
+            vote = refreshedVote
         }
     }
 
     private var adjustedScore: Int {
         item.comment.score + vote.rawValue - item.comment.vote.rawValue
+    }
+
+    private var isOwnComment: Bool {
+        let username = model.connectedRedditUsername ?? (model.isUsingFixtureData ? "local_reader" : nil)
+        guard let username else { return false }
+        return username.caseInsensitiveCompare(item.comment.author) == .orderedSame
+    }
+
+    private func changeVote(to requested: VoteState) async {
+        guard await model.vote(fullname: "t1_\(item.comment.id)", direction: requested) else { return }
+        vote = requested
     }
 
     private var scoreColor: Color {
@@ -533,11 +691,36 @@ private struct CommentRow: View {
     }
 }
 
+private enum CommentComposer: String, Identifiable {
+    case reply
+    case edit
+
+    var id: String { rawValue }
+}
+
 private struct ReplyComposer: View {
     let title: String
+    let initialText: String
+    let sendLabel: String
+    let send: (String) async -> Bool
 
     @Environment(\.dismiss) private var dismiss
-    @State private var text = ""
+    @EnvironmentObject private var model: AppModel
+    @State private var text: String
+    @State private var isSending = false
+
+    init(
+        title: String,
+        initialText: String = "",
+        sendLabel: String = "Send",
+        send: @escaping (String) async -> Bool
+    ) {
+        self.title = title
+        self.initialText = initialText
+        self.sendLabel = sendLabel
+        self.send = send
+        _text = State(initialValue: initialText)
+    }
 
     var body: some View {
         NavigationStack {
@@ -545,17 +728,12 @@ private struct ReplyComposer: View {
                 TextEditor(text: $text)
                     .font(.system(size: 14))
                     .padding(8)
-                HStack(spacing: 18) {
-                    Image(systemName: "bold")
-                    Image(systemName: "italic")
-                    Image(systemName: "link")
-                    Image(systemName: "quote.opening")
-                    Spacer()
+
+                if let message = model.writeErrorMessage {
+                    WriteErrorBanner(message: message) {
+                        model.writeErrorMessage = nil
+                    }
                 }
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 12)
-                .frame(height: 36)
-                .background(AppTheme.secondaryBackground)
             }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
@@ -564,10 +742,43 @@ private struct ReplyComposer: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Send") { dismiss() }
-                        .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button(sendLabel) {
+                        Task {
+                            guard !isSending else { return }
+                            isSending = true
+                            let succeeded = await send(text)
+                            isSending = false
+                            if succeeded { dismiss() }
+                        }
+                    }
+                    .disabled(
+                        isSending
+                            || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            || text == initialText
+                    )
                 }
             }
         }
+    }
+}
+
+private struct WriteErrorBanner: View {
+    let message: String
+    let dismiss: () -> Void
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+            Text(message)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Button("Dismiss", action: dismiss)
+                .fontWeight(.semibold)
+        }
+        .font(.system(size: 11))
+        .foregroundStyle(.white)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.red)
+        .accessibilityElement(children: .combine)
     }
 }

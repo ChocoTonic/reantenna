@@ -72,12 +72,24 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
+  ReAntennaAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/ReAntennaAppTests
+    dependencies:
+      - target: ReAntenna
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   ReAntenna:
     build:
       targets:
         ReAntenna: all
         AntennaCoreTests: [test]
+        ReAntennaAppTests: [test]
     test:
       targets:
         - AntennaCoreTests
+        - ReAntennaAppTests

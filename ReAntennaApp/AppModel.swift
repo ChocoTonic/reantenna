@@ -19,6 +19,7 @@ enum AppRoute: Hashable {
     case settings
     case redditAccount
     case privacy
+    case subredditPicker
     case listing(String)
 }
 
@@ -32,6 +33,7 @@ final class AppModel: ObservableObject {
     @Published var sort: FeedSort = .hot
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var writeErrorMessage: String?
     @Published private(set) var redditConnectionState: RedditConnectionState = .fixture
     @Published private(set) var redditConnectionError: String?
     @Published private(set) var isAuthenticatingReddit = false
@@ -54,6 +56,7 @@ final class AppModel: ObservableObject {
         }
     }
     @Published private(set) var recentlyViewedPostIDs: [String]
+    @Published private(set) var pendingWriteKeys: Set<String> = []
 
     private let fixtureService: any RedditService
     private let oauth: RedditOAuthManager
@@ -168,6 +171,34 @@ final class AppModel: ObservableObject {
         Task { await refresh() }
     }
 
+    /// Opens a user-selected subreddit after validating the public Reddit name.
+    /// Returns an error suitable for presenting inline, or `nil` on success.
+    func openSubreddit(named input: String) async -> String? {
+        let subreddit = normalizedSubredditName(input)
+        guard subreddit.range(
+            of: #"^[A-Za-z0-9_]{2,21}$"#,
+            options: .regularExpression
+        ) != nil else {
+            return "Enter a subreddit name using 2–21 letters, numbers, or underscores."
+        }
+
+        let previousFeed = selectedFeed
+        let previousPosts = posts
+        selectedFeed = "/r/\(subreddit)"
+        await refresh()
+
+        if let loadingError = errorMessage {
+            selectedFeed = previousFeed
+            posts = previousPosts
+            errorMessage = nil
+            return loadingError
+        }
+
+        path.removeAll()
+        closeMenu()
+        return nil
+    }
+
     func updatePost(id: String, _ change: (inout Post) -> Void) {
         guard let index = posts.firstIndex(where: { $0.id == id }) else { return }
         change(&posts[index])
@@ -202,6 +233,81 @@ final class AppModel: ObservableObject {
 
     var isRedditConnected: Bool {
         if case .connected = redditConnectionState { return true }
+        return false
+    }
+
+    var connectedRedditUsername: String? {
+        guard case let .connected(username) = redditConnectionState else { return nil }
+        return username
+    }
+
+    var isUsingFixtureData: Bool { !isRedditConnected }
+
+    func isWritePending(_ key: String) -> Bool {
+        pendingWriteKeys.contains(key)
+    }
+
+    func vote(fullname: String, direction: VoteState) async -> Bool {
+        await performWrite(key: "vote:\(fullname)") {
+            try await self.service.vote(fullName: fullname, direction: direction)
+        }
+    }
+
+    func setSaved(fullname: String, isSaved: Bool) async -> Bool {
+        await performWrite(key: "save:\(fullname)") {
+            try await self.service.setSaved(fullName: fullname, isSaved: isSaved)
+        }
+    }
+
+    func submitComment(parentFullname: String, text: String) async -> Bool {
+        let body = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !body.isEmpty else { return false }
+        return await performWrite(key: "comment:\(parentFullname)") {
+            _ = try await self.service.submitComment(parentFullName: parentFullname, text: body)
+        }
+    }
+
+    func edit(fullname: String, text: String) async -> Bool {
+        let body = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !body.isEmpty else { return false }
+        return await performWrite(key: "edit:\(fullname)") {
+            try await self.service.editText(fullName: fullname, text: body)
+        }
+    }
+
+    func delete(fullname: String) async -> Bool {
+        await performWrite(key: "delete:\(fullname)") {
+            try await self.service.deleteText(fullName: fullname)
+        }
+    }
+
+    private func performWrite(
+        key: String,
+        operation: () async throws -> Void
+    ) async -> Bool {
+        guard !pendingWriteKeys.contains(key) else { return false }
+        pendingWriteKeys.insert(key)
+        writeErrorMessage = nil
+        defer { pendingWriteKeys.remove(key) }
+
+        do {
+            try await operation()
+            return true
+        } catch let RedditServiceError.rateLimited(retryAfter) {
+            writeErrorMessage = "Reddit's rate limit was reached. Try again in \(max(1, Int(ceil(retryAfter)))) seconds."
+        } catch RedditServiceError.unauthorized {
+            writeErrorMessage = "Reddit authorization expired. Reconnect your account in Settings and try again."
+        } catch RedditServiceError.forbidden {
+            writeErrorMessage = "Reddit does not permit that action on this content or with the current account."
+        } catch let RedditServiceError.apiError(_, message) {
+            writeErrorMessage = message
+        } catch let RedditServiceError.invalidRequest(message) {
+            writeErrorMessage = message
+        } catch RedditServiceError.unsupportedOperation {
+            writeErrorMessage = "That Reddit action is not available in this build."
+        } catch {
+            writeErrorMessage = "Reddit did not accept that action. Check your connection and try again."
+        }
         return false
     }
 
@@ -260,6 +366,16 @@ final class AppModel: ObservableObject {
     private func savePreferences() {
         guard let data = try? JSONEncoder().encode(preferences) else { return }
         UserDefaults.standard.set(data, forKey: DefaultsKey.preferences)
+    }
+
+    private func normalizedSubredditName(_ input: String) -> String {
+        var name = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.lowercased().hasPrefix("/r/") {
+            name.removeFirst(3)
+        } else if name.lowercased().hasPrefix("r/") {
+            name.removeFirst(2)
+        }
+        return name
     }
 
     private func configureURLCache() {

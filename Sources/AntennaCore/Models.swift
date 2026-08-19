@@ -55,7 +55,7 @@ public struct Post: Identifiable, Hashable, Codable, Sendable {
     public let age: String
     public let flair: String?
     public let kind: PostKind
-    public let body: String?
+    public var body: String?
     public var score: Int
     public var commentCount: Int
     public var vote: VoteState
@@ -104,7 +104,7 @@ public struct Post: Identifiable, Hashable, Codable, Sendable {
 public struct Comment: Identifiable, Hashable, Codable, Sendable {
     public let id: String
     public let author: String
-    public let body: String
+    public var body: String
     public let age: String
     public var score: Int
     public var vote: VoteState

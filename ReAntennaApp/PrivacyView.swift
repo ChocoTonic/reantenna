@@ -8,7 +8,8 @@ struct PrivacyView: View {
             Form {
                 Section("Collection") {
                     Text("ReAntenna has no developer-operated server, ads, analytics, tracking, data sales, or AI training. In fixture mode it does not access Reddit.")
-                    Text("After explicit OAuth consent in an approved live build, it processes account identity, feeds, posts, comments, and subscriptions only to display the requested reading experience.")
+                    Text("After explicit OAuth consent in an approved live build, it processes account identity, feeds, posts, comments, comment text you submit, votes, and saved state only to perform the action you request.")
+                    Text("Every write is initiated by you. ReAntenna does not send private messages, moderate, report or hide content, submit new posts, or perform scheduled or background writes.")
                 }
 
                 Section("On this device") {

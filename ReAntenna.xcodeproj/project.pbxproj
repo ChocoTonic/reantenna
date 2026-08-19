@@ -18,12 +18,14 @@
 		4C20CBAE15D43CA4A1C82DEE /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F3CCC923E4C2D5882BDEB8 /* FeedView.swift */; };
 		52C542F40CC857671E9216C6 /* AntennaCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1AE2539D6F1253A23986C599 /* AntennaCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		55206C76817C4A8FB14485F7 /* AntennaCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AE2539D6F1253A23986C599 /* AntennaCore.framework */; };
+		5F775BC0905411A8D41CB3D9 /* AppModelWriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B0E09D3C255F2D1A404F622 /* AppModelWriteTests.swift */; };
 		66954387DF2462D37BD9B6D2 /* RedditService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3075361B0299FB0946961FBA /* RedditService.swift */; };
 		8266958C68C64C10283CA4FD /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFBA71CAA7443284FECF298 /* PrivacyView.swift */; };
 		82A33A9B6B0C9F78C08FBEEF /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22A677384D5E61D48EAE440 /* RootView.swift */; };
 		847B10AFD95F4D58BBDC439A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F5FBC5B839BB3849A99064 /* SettingsView.swift */; };
 		B82111845EF5AA349A670FA5 /* RedditOAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */; };
 		BFF83EEBBDD8C484A666CD61 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF8A26B7A4513A68A4369B62 /* Theme.swift */; };
+		C8CB6403D0891BB38E1272CE /* SubredditPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007B3DBD648E854D03E6DBEF /* SubredditPickerView.swift */; };
 		D16FD919EB11750842CA9073 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB3A7C565281BCB8AC645759 /* AppModel.swift */; };
 		DCC8395E0B750A7819DE3E59 /* RedditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A865D645D1C90452C761F0 /* RedditAccountView.swift */; };
 		DE3AC220F529D810491BFF20 /* FixtureRedditService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3467003D8D9452C860F4E874 /* FixtureRedditService.swift */; };
@@ -33,6 +35,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		705DBE6427A87CC33939F676 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8E7B97FBA5E759B71418F517 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A775D5B69C381399B39A652D;
+			remoteInfo = ReAntenna;
+		};
 		7656E231E628AAA329552B70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8E7B97FBA5E759B71418F517 /* Project object */;
@@ -75,6 +84,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		007B3DBD648E854D03E6DBEF /* SubredditPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubredditPickerView.swift; sourceTree = "<group>"; };
 		063300B0421CC9CBE3C8AAD6 /* AntennaCoreTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = AntennaCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		09587CEB89AF6FFD75B63603 /* PlaceholderListingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderListingView.swift; sourceTree = "<group>"; };
 		0B11AB9F63CE208B08494C7E /* ReAntennaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReAntennaApp.swift; sourceTree = "<group>"; };
@@ -82,6 +92,7 @@
 		1E4E4E9A2F470CD5356210B4 /* ReAntenna.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReAntenna.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3075361B0299FB0946961FBA /* RedditService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedditService.swift; sourceTree = "<group>"; };
 		3467003D8D9452C860F4E874 /* FixtureRedditService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureRedditService.swift; sourceTree = "<group>"; };
+		3B0E09D3C255F2D1A404F622 /* AppModelWriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModelWriteTests.swift; sourceTree = "<group>"; };
 		48A865D645D1C90452C761F0 /* RedditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedditAccountView.swift; sourceTree = "<group>"; };
 		51BBC790038680550CC7B428 /* AntennaCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntennaCoreTests.swift; sourceTree = "<group>"; };
 		63F3CCC923E4C2D5882BDEB8 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
@@ -92,6 +103,7 @@
 		92E618BDC44C294A6FF5F936 /* SwipeMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeMenuView.swift; sourceTree = "<group>"; };
 		94A7706BE9C4319FAF7AB68E /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 		9B5938BBFCD6AC8162D8D9F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A2BCF842029AA20DE99E428B /* ReAntennaAppTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ReAntennaAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA651FF3F365CCB19C22CB65 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		BE22F5307CC1F4A4E1D43E34 /* CommentTraversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTraversal.swift; sourceTree = "<group>"; };
 		BF8A26B7A4513A68A4369B62 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -121,10 +133,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1628C128752264F8DBFF802D /* ReAntennaAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				3B0E09D3C255F2D1A404F622 /* AppModelWriteTests.swift */,
+			);
+			path = ReAntennaAppTests;
+			sourceTree = "<group>";
+		};
 		49C871079A8E995B29D795AE /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				8619E77E645E3DC37FA2A914 /* AntennaCoreTests */,
+				1628C128752264F8DBFF802D /* ReAntennaAppTests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -162,6 +183,7 @@
 				1AE2539D6F1253A23986C599 /* AntennaCore.framework */,
 				063300B0421CC9CBE3C8AAD6 /* AntennaCoreTests.xctest */,
 				1E4E4E9A2F470CD5356210B4 /* ReAntenna.app */,
+				A2BCF842029AA20DE99E428B /* ReAntennaAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -180,6 +202,7 @@
 				C8C279C6FAE32C83E7002197 /* RedditOAuthManager.swift */,
 				F22A677384D5E61D48EAE440 /* RootView.swift */,
 				71F5FBC5B839BB3849A99064 /* SettingsView.swift */,
+				007B3DBD648E854D03E6DBEF /* SubredditPickerView.swift */,
 				92E618BDC44C294A6FF5F936 /* SwipeMenuView.swift */,
 				BF8A26B7A4513A68A4369B62 /* Theme.swift */,
 				92C8C9943A7288D699AC26AE /* TopBar.swift */,
@@ -210,6 +233,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4747630F04D763E21D900669 /* ReAntennaAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0624432F19EEA17223302A8E /* Build configuration list for PBXNativeTarget "ReAntennaAppTests" */;
+			buildPhases = (
+				9555C7495B338DE5D24951EE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C59A605AC7353E85EF43E32 /* PBXTargetDependency */,
+			);
+			name = ReAntennaAppTests;
+			packageProductDependencies = (
+			);
+			productName = ReAntennaAppTests;
+			productReference = A2BCF842029AA20DE99E428B /* ReAntennaAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A775D5B69C381399B39A652D /* ReAntenna */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F95031293336F5CC1C32E25 /* Build configuration list for PBXNativeTarget "ReAntenna" */;
@@ -276,6 +317,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					4747630F04D763E21D900669 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 					A775D5B69C381399B39A652D = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -307,11 +352,20 @@
 				DD31A19183854BAC72D8BB67 /* AntennaCore */,
 				A775D5B69C381399B39A652D /* ReAntenna */,
 				CD07DC2D404B29B9C189E593 /* AntennaCoreTests */,
+				4747630F04D763E21D900669 /* ReAntennaAppTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9555C7495B338DE5D24951EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F775BC0905411A8D41CB3D9 /* AppModelWriteTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A2E37EA1A955313A66764129 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -338,6 +392,7 @@
 				B82111845EF5AA349A670FA5 /* RedditOAuthManager.swift in Sources */,
 				82A33A9B6B0C9F78C08FBEEF /* RootView.swift in Sources */,
 				847B10AFD95F4D58BBDC439A /* SettingsView.swift in Sources */,
+				C8CB6403D0891BB38E1272CE /* SubredditPickerView.swift in Sources */,
 				FEFF3F251F50F23467F206E9 /* SwipeMenuView.swift in Sources */,
 				BFF83EEBBDD8C484A666CD61 /* Theme.swift in Sources */,
 				430B0CBE5A59E8D5630A93BA /* TopBar.swift in Sources */,
@@ -355,6 +410,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0C59A605AC7353E85EF43E32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A775D5B69C381399B39A652D /* ReAntenna */;
+			targetProxy = 705DBE6427A87CC33939F676 /* PBXContainerItemProxy */;
+		};
 		BB71C74646A0C4B73B3A3525 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DD31A19183854BAC72D8BB67 /* AntennaCore */;
@@ -368,6 +428,23 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		081226F9F94C33AD1AD93400 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chocotonic.reantenna.ReAntennaAppTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReAntenna.app/ReAntenna";
+			};
+			name = Debug;
+		};
 		102ED02239DF7182CA0860F9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 85D6D7D3D02A4CA6B58F3392 /* RedditConfig.xcconfig */;
@@ -498,6 +575,23 @@
 			};
 			name = Release;
 		};
+		923984680071FB5046434AAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chocotonic.reantenna.ReAntennaAppTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReAntenna.app/ReAntenna";
+			};
+			name = Release;
+		};
 		B14305A0B5371DFDDC1FE0A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -612,6 +706,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0624432F19EEA17223302A8E /* Build configuration list for PBXNativeTarget "ReAntennaAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				081226F9F94C33AD1AD93400 /* Debug */,
+				923984680071FB5046434AAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		3F95031293336F5CC1C32E25 /* Build configuration list for PBXNativeTarget "ReAntenna" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -18,7 +18,7 @@ struct SwipeMenuView: View {
                     row("Messages", icon: "envelope") { model.selectRoute(.listing("Messages")) }
                     row("Saved", icon: "tray.and.arrow.down") { model.selectRoute(.listing("Saved")) }
                     row("Overview", icon: "list.bullet.rectangle") { model.selectRoute(.listing("Overview")) }
-                    row("/r  Subreddit", icon: "textformat") { model.selectRoute(.listing("Go to Subreddit")) }
+                    row("/r  Subreddit", icon: "textformat") { model.selectRoute(.subredditPicker) }
                     row("/u  User", icon: "person") { model.selectRoute(.listing("Go to User")) }
                     row("Night mode", icon: "moon") { toggleNightMode() }
                     row("Home", icon: "house") { goHome() }

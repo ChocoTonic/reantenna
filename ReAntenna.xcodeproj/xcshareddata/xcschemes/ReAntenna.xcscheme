@@ -35,6 +35,20 @@
                ReferencedContainer = "container:ReAntenna.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4747630F04D763E21D900669"
+               BuildableName = "ReAntennaAppTests.xctest"
+               BlueprintName = "ReAntennaAppTests"
+               ReferencedContainer = "container:ReAntenna.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -61,6 +75,17 @@
                BlueprintIdentifier = "CD07DC2D404B29B9C189E593"
                BuildableName = "AntennaCoreTests.xctest"
                BlueprintName = "AntennaCoreTests"
+               ReferencedContainer = "container:ReAntenna.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4747630F04D763E21D900669"
+               BuildableName = "ReAntennaAppTests.xctest"
+               BlueprintName = "ReAntennaAppTests"
                ReferencedContainer = "container:ReAntenna.xcodeproj">
             </BuildableReference>
          </TestableReference>
