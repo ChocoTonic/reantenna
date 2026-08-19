@@ -1,6 +1,6 @@
 # Register ReAntenna for Reddit Data API access
 
-Last verified: 2026-08-18
+Last verified: 2026-08-19
 
 Reddit currently requires explicit approval before a new application accesses
 Reddit data through the Data API. ReAntenna is an external native iOS client, so
@@ -55,14 +55,16 @@ The form verified on 2026-08-19 contains these fields in this order:
 | What is your inquiry?                                            | **I’m a developer and want to build a Reddit App that does not work in the Devvit ecosystem.** |
 | Reddit account name                                              | `giddiness-uneasy`                                                                             |
 
-For **What benefit/purpose will the bot/app have for Redditors?**, paste:
+Reddit displays **What benefit/purpose will the bot/app have for Redditors?** followed by **Provide a detailed description of what the Bot/App will be doing on the Reddit platform** and a request for examples. These instructions apply to the same response box. Paste this answer, which addresses each part explicitly:
 
 ```text
-ReAntenna is a personal, noncommercial native iOS Reddit reader with a compact, gesture-first interface for feeds and comment threads, including root-comment navigation and collapsing all child comments while keeping roots visible. It is independently written, inspired by the discontinued Antenna/AMRC interaction model, and is not affiliated with Reddit or the original developer.
+Benefit/purpose: ReAntenna gives Redditors a compact, accessible native iOS reading interface with fast gesture navigation, dense feeds, root-comment navigation, and the ability to collapse all child comments while keeping root comments visible. It is a personal, noncommercial, independently written app inspired by the discontinued Antenna/AMRC interaction model and is not affiliated with Reddit or the original developer.
 
-The initial version is for one personal iPhone installed through SideStore. It requests read-only OAuth access for identity, reading, and subreddit subscriptions, and displays normal feeds, selected subreddits, posts, comments, and comment trees. It performs no automated voting, posting, messaging, moderation, or account activity.
+Detailed behavior: The initial version is for one personal iPhone installed through SideStore. After the user explicitly signs in with Reddit OAuth, the app requests only identity, read, and subscribed-subreddit access. It retrieves the user's home feed, selected subreddit listings, posts, post text, comment trees, and subreddit subscriptions. The user can sort and browse feeds, open a post, read its comments, collapse individual branches or every child branch, and move between root comments. Every action is initiated interactively by the user. The initial version performs no voting, posting, replying, messaging, moderation, or automated account activity.
 
-The app has no ads, payments, analytics, data resale, AI training, scraping, or server-side collection. OAuth runs through ASWebAuthenticationSession, tokens stay in the iOS Keychain, passwords are never collected, caching is limited, deleted content is removed, and rate-limit headers are respected.
+Examples: A user can open their home feed, switch to a subscribed or manually selected subreddit, open a discussion, choose a comment sort, collapse all replies beneath the root comments, and move directly to the next root comment. The app does not collect subreddits in bulk or act without the user.
+
+Data handling: The app has no ads, payments, analytics, data resale, AI training, scraping, or server-side collection. OAuth runs through ASWebAuthenticationSession, tokens remain in the iOS Keychain, passwords are never collected, local caching is limited, deleted content is removed, and Reddit's rate-limit headers are respected. The current build is a working fixture-data prototype; live Data API access remains disabled until Reddit approves this request and issues an installed-app client ID.
 
 OAuth redirect URI: reantenna://oauth
 Bundle identifier: com.chocotonic.reantenna
