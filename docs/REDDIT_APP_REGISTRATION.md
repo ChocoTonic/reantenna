@@ -45,18 +45,17 @@ Before applying:
 Open the official [Data API access request](https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=14868593862164)
 while signed into Reddit.
 
-The form path verified on 2026-08-18 uses these fields:
+The form verified on 2026-08-19 contains these fields in this order:
 
-| Field | Answer |
-| --- | --- |
-| Assistance | **Data Access Request** |
-| Role | **I'm a developer** |
-| Inquiry | **I'm a developer and want to build a Reddit App that does not work in the Devvit ecosystem.** |
-| Reddit account | `giddiness-uneasy` |
-| Source | `https://github.com/ChocoTonic/reantenna` |
-| Bot username | `N/A — users authenticate through OAuth.` |
+| Exact form field                                                 | Enter                                                                                          |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| What do you need assistance with?                                | **Data Access Request**                                                                        |
+| Your email address                                               | The email associated with your Reddit account                                                  |
+| Which role best describes your reason for requesting API access? | **I’m a developer**                                                                            |
+| What is your inquiry?                                            | **I’m a developer and want to build a Reddit App that does not work in the Devvit ecosystem.** |
+| Reddit account name                                              | `giddiness-uneasy`                                                                             |
 
-Use an email address you monitor. For **What benefit/purpose will the bot/app have for Redditors?**, paste:
+For **What benefit/purpose will the bot/app have for Redditors?**, paste:
 
 ```text
 ReAntenna is a personal, noncommercial native iOS Reddit reader with a compact, gesture-first interface for feeds and comment threads, including root-comment navigation and collapsing all child comments while keeping roots visible. It is independently written, inspired by the discontinued Antenna/AMRC interaction model, and is not affiliated with Reddit or the original developer.
@@ -70,19 +69,31 @@ Bundle identifier: com.chocotonic.reantenna
 User-Agent: ios:com.chocotonic.reantenna:v0.2.0 (by /u/giddiness-uneasy)
 ```
 
-For **What is missing from Devvit?**, paste:
+For **What is missing from Devvit that prevents building on that platform?**, paste:
 
 ```text
 ReAntenna is a standalone native SwiftUI app installed on an iPhone. It requires native navigation, local preferences, Keychain-based user OAuth, account-level feeds and subscriptions, and browsing across user-selected communities. Devvit apps run inside Reddit posts or installed communities and cannot expose private account data such as subscribed subreddits, saved content, vote history, or recently viewed posts. Devvit therefore cannot provide this native client or its account-level reading workflow.
 ```
 
-For **What subreddits do you intend to use?**, paste:
+For **Provide a link to source code or platform that will access the API.**, enter:
+
+```text
+https://github.com/ChocoTonic/reantenna
+```
+
+For **What subreddits do you intend to use the bot/app in?**, paste:
 
 ```text
 The authenticated user's subscribed and manually selected subreddits, plus normal home/front-page and r/all-style reading feeds. There is no fixed subreddit list, automation, or bulk collection.
 ```
 
-The repository is currently private, so Reddit cannot inspect the source link. Make it public with a license before submitting, or state that it is private personal source and attach a reviewable archive. Never attach credentials, tokens, signing or pairing files, IPA/build products, `Config/Reddit.local.xcconfig`, or the historic Antenna backup.
+For **If applicable, what username will you be operating this Bot/App under?(optional)**, enter:
+
+```text
+N/A — the app has no bot account. Users authenticate through OAuth.
+```
+
+**Attachments(optional):** leave empty unless attaching a screenshot or reviewable source archive. The repository is currently private, so Reddit cannot inspect its link. Never attach credentials, tokens, signing or pairing files, IPA/build products, `Config/Reddit.local.xcconfig`, or the historic Antenna backup.
 
 ## 3. Wait for explicit approval
 
