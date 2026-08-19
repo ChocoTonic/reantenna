@@ -8,7 +8,7 @@ ReAntenna must not access live Reddit data until Reddit gives explicit written a
 
 Reddit gave a generic Responsible Builder Policy/details rejection rather than a specific defect. The original submission left reviewers to infer several facts: exact endpoint patterns and actions, expected request volume, why Devvit cannot implement a standalone iOS reader, retention and deletion behavior, app-label applicability, and how the code enforces the claimed safeguards. The linked repository was also described as private even though it is public, had no privacy policy, had no complete in-app deletion control, requested one unused OAuth scope, allowed shared URL caching, and observed rate-limit headers without blocking subsequent calls.
 
-Those implementation issues are now addressed: the repository is public; `PRIVACY.md` is public and linked in the app; the initial scopes are only `identity` and `read`; Reddit HTTP uses ephemeral non-caching sessions; a depleted rate limit blocks calls until reset; local media cache is purged at least every 48 hours on launch; and the Reddit Account screen can revoke authorization and delete Keychain credentials, history, and cached responses. The project is source-available but not currently open source because no license has been selected.
+Those implementation issues are now addressed: the repository is public and MIT-licensed; `PRIVACY.md` is public and linked in the app; the initial scopes are only `identity` and `read`; Reddit HTTP uses ephemeral non-caching sessions; a depleted rate limit blocks calls until reset; local media cache is purged at least every 48 hours on launch; and the Reddit Account screen can revoke authorization and delete Keychain credentials, history, and cached responses.
 
 Do not submit simultaneous or duplicate requests. Reply to ticket **18313736** with the clarification below. Submit a new form only if Reddit tells you to do so or the existing ticket cannot be reopened.
 
@@ -28,6 +28,7 @@ ReAntenna has no developer server, ads, analytics, tracking, payments, data resa
 Devvit cannot implement this use case because ReAntenna is a standalone native SwiftUI application with device-level navigation, accessibility, Keychain OAuth, local preferences, and user-directed browsing across communities. It is not an experience embedded in a Reddit post or community. No fixed subreddit list is targeted; the user manually chooses ordinary public communities and feeds.
 
 Public source: https://github.com/ChocoTonic/reantenna
+License: https://github.com/ChocoTonic/reantenna/blob/main/LICENSE
 Privacy policy: https://github.com/ChocoTonic/reantenna/blob/main/PRIVACY.md
 Bundle ID: com.chocotonic.reantenna
 Redirect URI: reantenna://oauth
@@ -65,7 +66,7 @@ Expected use is one person, normally a few requests per browsing minute and alwa
 
 There is no developer-operated backend. The app has no ads, analytics, tracking, payments, commercialization, data resale or licensing, AI/model training, sensitive-characteristic inference, re-identification, or matching to off-platform identities. OAuth passwords are handled only by Reddit's authorization page. Tokens are stored in the iOS Keychain with device-only accessibility. Reddit API URL caching is disabled. Local preferences and at most 100 recently viewed post IDs stay on the device. A user-controlled media cache is purged at least every 48 hours on app launch. Users can clear history and cache separately or use Delete Reddit Data to attempt OAuth revocation and remove credentials, history, and cached responses. Deleted Reddit content is not retained in a persistent API cache and disappears after refresh.
 
-The public code and privacy policy are available at https://github.com/ChocoTonic/reantenna and https://github.com/ChocoTonic/reantenna/blob/main/PRIVACY.md. Bundle identifier: com.chocotonic.reantenna. OAuth redirect URI: reantenna://oauth. Live access is disabled until Reddit explicitly approves it.
+The MIT-licensed public code and privacy policy are available at https://github.com/ChocoTonic/reantenna and https://github.com/ChocoTonic/reantenna/blob/main/PRIVACY.md. Bundle identifier: com.chocotonic.reantenna. OAuth redirect URI: reantenna://oauth. Live access is disabled until Reddit explicitly approves it.
 ```
 
 ### Provide examples, the more detailed this description the more likely we will be able to assess your request.
@@ -126,4 +127,4 @@ Attachments are optional. If useful, attach current screenshots of the fixture-m
 
 Complete Reddit's required developer/app-profile registration and any directed labeling, then create one **installed app** OAuth client at Reddit's application preferences using `reantenna://oauth`; an installed app has a client ID and no client secret. Put only the client ID and `giddiness-uneasy` in the ignored `Config/Reddit.local.xcconfig`, regenerate with `xcodegen generate`, and verify the consent page lists only `identity` and `read`. Keep the bundle identifier unchanged. Do not add write scopes or enable live use beyond the approved purpose.
 
-Before describing ReAntenna as open source, the owner must choose and add a license. Until then, call it source-available. This is separate from Reddit approval and should not be misrepresented.
+ReAntenna is open source under the MIT License. This license does not grant Reddit Data API access; explicit Reddit approval remains required.

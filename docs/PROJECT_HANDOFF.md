@@ -45,9 +45,7 @@ Do these in this order:
    This has been completed and `xcodebuild -version` reports Xcode 26.6.
 3. Keep the permanent bundle identifier `com.chocotonic.reantenna`; do not change
    it after installing the app if local data should survive updates.
-4. Decide whether the public, source-available GitHub repository should become
-   open source. It needs a license before it should be described as open source to
-   Reddit. The repository is public but has no `LICENSE` file.
+4. The public GitHub repository is open source under the MIT License.
 5. Begin the Reddit Data API request in **Reddit access**. Never paste an Apple
    password, Reddit password, OAuth refresh token, signing certificate, or device
    pairing file into chat or the repository.
@@ -153,8 +151,8 @@ Do these in this order:
 - The exact iOS 18 point release, Mac model/architecture, macOS version, Xcode
   version, and the installed SideStore/iLoader/LocalDevVPN versions as they become
   available.
-- Permission to switch the repository from private to public, if desired, and a
-  license choice. MIT is a straightforward default for this kind of sample app.
+- The repository visibility and license are complete: the repository is public
+  under the MIT License.
 - A permanent reverse-DNS bundle identifier.
 - A Reddit username to place in the required descriptive User-Agent.
 - The result of Reddit's Data API review and the newly issued **installed-app client
@@ -174,9 +172,9 @@ and the rules in the
 
 ### R1 — settle identity before applying
 
-**Do:** Choose the bundle ID, Reddit contact username, repository visibility, and
-license. Keep the project noncommercial: no ads, payment, subscriptions, resale,
-or model training. A truthful application description is:
+**Do:** Keep the settled bundle ID, Reddit contact username, public repository, and
+MIT License unchanged. Keep the project noncommercial: no ads, payments,
+subscriptions, resale, or model training. A truthful application description is:
 
 > ReAntenna is a personal, noncommercial native iOS Reddit reader and interaction
 > client, independently implemented as an unofficial spiritual successor to the
@@ -185,17 +183,17 @@ or model training. A truthful application description is:
 > data, and will use OAuth plus a descriptive User-Agent. Source URL:
 > https://github.com/ChocoTonic/reantenna.
 
-**Success looks like:** We have one stable bundle ID and can truthfully describe the
-repository accurately as public source-available code until a license is selected.
+**Success looks like:** The bundle ID is stable, and the repository is accurately
+described as public open-source code under the MIT License.
 
-**Important choice:** Do not claim the current public, unlicensed repository is
-open source. Do not call the app official Antenna or imply endorsement.
+**Important choice:** The MIT License covers ReAntenna's independently written code.
+It does not grant rights to Reddit or Antenna trademarks, source code, or assets.
 
 **Common failure:** A name or callback changes after OAuth registration. Fix it by
 settling the bundle ID and callback first. Proposed callback:
 `reantenna://oauth`.
 
-**STOP:** Choose a license only if you want to make the source open source.
+**STOP:** Identity and licensing are complete. Continue with the Data API request.
 
 ### R2 — request Data API access and register the client
 
