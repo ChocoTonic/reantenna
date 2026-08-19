@@ -45,157 +45,44 @@ Before applying:
 Open the official [Data API access request](https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=14868593862164)
 while signed into Reddit.
 
-The form path verified on 2026-08-18 displays the fields below. Fill them as
-follows, replacing every `YOUR_USERNAME` placeholder.
+The form path verified on 2026-08-18 uses these fields:
 
-### What do you need assistance with?
+| Field | Answer |
+| --- | --- |
+| Assistance | **Data Access Request** |
+| Role | **I'm a developer** |
+| Inquiry | **I'm a developer and want to build a Reddit App that does not work in the Devvit ecosystem.** |
+| Reddit account | `giddiness-uneasy` |
+| Source | `https://github.com/ChocoTonic/reantenna` |
+| Bot username | `N/A — users authenticate through OAuth.` |
 
-Select:
-
-```text
-Data Access Request
-```
-
-### Your email address
-
-Use the email address you actively monitor and that is associated with the Reddit
-account responsible for ReAntenna.
-
-### Which role best describes your reason for requesting API access?
-
-Select:
+Use an email address you monitor. For **What benefit/purpose will the bot/app have for Redditors?**, paste:
 
 ```text
-I'm a developer
-```
+ReAntenna is a personal, noncommercial native iOS Reddit reader with a compact, gesture-first interface for feeds and comment threads, including root-comment navigation and collapsing all child comments while keeping roots visible. It is independently written, inspired by the discontinued Antenna/AMRC interaction model, and is not affiliated with Reddit or the original developer.
 
-### What is your inquiry?
+The initial version is for one personal iPhone installed through SideStore. It requests read-only OAuth access for identity, reading, and subreddit subscriptions, and displays normal feeds, selected subreddits, posts, comments, and comment trees. It performs no automated voting, posting, messaging, moderation, or account activity.
 
-Select:
-
-```text
-I'm a developer and want to build a Reddit App that does not work in the Devvit ecosystem.
-```
-
-Do not select the moderator-tool option. ReAntenna is a general native reader, not
-a tool whose primary purpose is moderating a subreddit.
-
-### Reddit account name
-
-Enter only the username responsible for the application, without `/u/`:
-
-```text
-YOUR_USERNAME
-```
-
-### What benefit/purpose will the bot/app have for Redditors?
-
-This field also asks for a detailed description of what the application will do.
-Paste the following after replacing `YOUR_USERNAME`:
-
-```text
-ReAntenna is a personal, noncommercial native iOS Reddit reader. It
-provides a compact, gesture-first interface for reading feeds and comment
-threads, including efficient root-comment navigation and the ability to
-collapse all child comments while preserving the root comments. It is
-intended to provide an accessible, information-dense native reading
-experience on an iPhone.
-
-ReAntenna is independently written and is an unofficial application
-inspired by the interaction model of the discontinued Antenna/AMRC
-client. It is not affiliated with Reddit or the original Antenna
-developer.
-
-The initial version will be used only by me on my personal iPhone and
-installed through SideStore. Initial Data API access will be read-only.
-It will use OAuth scopes for identity, reading, and the authenticated
-user's subreddit subscriptions. It will display the user's normal feeds,
-selected subreddits, posts, comments, and comment trees. It will not
-perform automated voting, posting, messaging, moderation, or other
-automated account activity.
-
-The app has no advertising, subscriptions, payments, analytics, data
-resale, AI training, scraping, or server-side data collection. It makes
-requests directly from the user's device.
-
-Authentication uses Reddit OAuth through Apple's
-ASWebAuthenticationSession. Access and refresh tokens are stored only in
-the iOS Keychain, and the app never collects a Reddit password. Local
-caching is limited, and deleted or expired Reddit content will be removed
-in accordance with Reddit's retention requirements. The client will
-monitor Reddit's rate-limit response headers and remain substantially
-below the documented free-access limit.
+The app has no ads, payments, analytics, data resale, AI training, scraping, or server-side collection. OAuth runs through ASWebAuthenticationSession, tokens stay in the iOS Keychain, passwords are never collected, caching is limited, deleted content is removed, and rate-limit headers are respected.
 
 OAuth redirect URI: reantenna://oauth
 Bundle identifier: com.chocotonic.reantenna
-User-Agent: ios:com.chocotonic.reantenna:v0.2.0 (by /u/YOUR_USERNAME)
-Initial audience: one user
+User-Agent: ios:com.chocotonic.reantenna:v0.2.0 (by /u/giddiness-uneasy)
 ```
 
-### What is missing from Devvit that prevents building on that platform?
-
-Paste:
+For **What is missing from Devvit?**, paste:
 
 ```text
-ReAntenna is a standalone native SwiftUI iOS application installed on the
-user's device. It requires native device navigation, local preferences,
-Keychain-based per-user OAuth, account-level feeds and subscriptions, and
-browsing across the user's selected communities.
-
-Devvit applications run inside Reddit posts or installed communities as
-web experiences. Devvit's Reddit API documentation also states that it
-does not expose private logged-in-user data such as subscribed
-subreddits, saved content, vote history, or recently viewed posts. Devvit
-therefore cannot provide ReAntenna's standalone native interface or its
-required account-level reading workflow. This use case requires an
-approved Data API installed-app OAuth client.
+ReAntenna is a standalone native SwiftUI app installed on an iPhone. It requires native navigation, local preferences, Keychain-based user OAuth, account-level feeds and subscriptions, and browsing across user-selected communities. Devvit apps run inside Reddit posts or installed communities and cannot expose private account data such as subscribed subreddits, saved content, vote history, or recently viewed posts. Devvit therefore cannot provide this native client or its account-level reading workflow.
 ```
 
-### Provide a link to source code or platform that will access the API
-
-If the repository has been made public, enter:
+For **What subreddits do you intend to use?**, paste:
 
 ```text
-https://github.com/ChocoTonic/reantenna
+The authenticated user's subscribed and manually selected subreddits, plus normal home/front-page and r/all-style reading feeds. There is no fixed subreddit list, automation, or bulk collection.
 ```
 
-The repository is currently private. A private GitHub URL does not let Reddit's
-reviewer inspect the source. Either make it public and add a license before
-submitting, or truthfully explain that it is private personal source and attach a
-reviewable source archive if the form permits it. Do not attach build products,
-signing files, pairing files, tokens, credentials, or the historic Antenna backup.
-
-### What subreddits do you intend to use the bot/app in?
-
-Paste:
-
-```text
-The authenticated user's subscribed and manually selected subreddits,
-along with the normal home/front-page and r/all-style reading feeds. There
-is no fixed subreddit list, subreddit-specific automation, or bulk data
-collection. Initially the app will be used by one person for ordinary
-interactive reading.
-```
-
-### If applicable, what username will you be operating this Bot/App under?
-
-ReAntenna does not operate a bot account. Enter:
-
-```text
-N/A — the app has no bot account. The user signs into their own Reddit account through OAuth.
-```
-
-### Attachments
-
-Attachments are optional. Useful attachments are a screenshot of the working
-fixture-mode interface or a small source archive if the repository remains private.
-Before attaching an archive, verify that it excludes:
-
-- `Config/Reddit.local.xcconfig`
-- build products and IPA files
-- Apple signing or device-pairing material
-- OAuth tokens, cookies, passwords, or Keychain exports
-- the historic Antenna iMazing backup
+The repository is currently private, so Reddit cannot inspect the source link. Make it public with a license before submitting, or state that it is private personal source and attach a reviewable archive. Never attach credentials, tokens, signing or pairing files, IPA/build products, `Config/Reddit.local.xcconfig`, or the historic Antenna backup.
 
 ## 3. Wait for explicit approval
 
@@ -231,7 +118,7 @@ historic Antenna credential in chat, source control, or an xcconfig file.
 Provide only these two non-secret values:
 
 ```text
-Reddit username: YOUR_USERNAME
+Reddit username: giddiness-uneasy
 Client ID: YOUR_INSTALLED_APP_CLIENT_ID
 ```
 
@@ -247,7 +134,7 @@ Set:
 
 ```xcconfig
 REDDIT_CLIENT_ID = YOUR_INSTALLED_APP_CLIENT_ID
-REDDIT_DEVELOPER_USERNAME = YOUR_USERNAME_WITHOUT_U_SLASH
+REDDIT_DEVELOPER_USERNAME = giddiness-uneasy
 ```
 
 Regenerate and build:
@@ -280,7 +167,7 @@ delete the old installation first if its local data should survive.
 4. Select **Connect Reddit**.
 5. Verify Reddit displays only `identity`, `read`, and `mysubreddits` initially.
 6. Approve the request.
-7. Confirm the account screen displays `u/YOUR_USERNAME`.
+7. Confirm the account screen displays `u/giddiness-uneasy`.
 8. Confirm the front page and a comment thread load live Reddit data.
 9. Force-quit and reopen ReAntenna to verify Keychain restoration and token refresh.
 10. Disconnect once and verify the app returns to fixture mode.
