@@ -24,7 +24,7 @@ Use these stable values:
 | Platform           | Native iOS installed application          |
 | Bundle identifier  | `com.chocotonic.reantenna`                |
 | OAuth redirect URI | `reantenna://oauth`                       |
-| Distribution       | Personal device through SideStore         |
+| Distribution       | Personal use on one iPhone                 |
 | Business status    | Individual, noncommercial                 |
 | Company            | `N/A`                                     |
 | Source URL         | `https://github.com/ChocoTonic/reantenna` |
@@ -64,7 +64,7 @@ ReAntenna gives Redditors a compact, accessible native iOS reading interface wit
 For **Provide a detailed description of what the Bot/App will be doing on the Reddit platform.**, paste:
 
 ```text
-The initial version is for one personal iPhone installed through SideStore. After the user explicitly signs in with Reddit OAuth, ReAntenna requests only identity, read, and subscribed-subreddit access. It retrieves the user's home feed, selected subreddit listings, posts, post text, comment trees, and subreddit subscriptions. The user can sort and browse feeds, open a post, read its comments, collapse individual branches or every child branch, and move between root comments. Every action is initiated interactively by the user. The initial version performs no voting, posting, replying, messaging, moderation, or automated account activity.
+The initial version is for personal use on one iPhone. After the user explicitly signs in with Reddit OAuth, ReAntenna requests only identity, read, and subscribed-subreddit access. It retrieves the user's home feed, selected subreddit listings, posts, post text, comment trees, and subreddit subscriptions. The user can sort and browse feeds, open a post, read its comments, collapse individual branches or every child branch, and move between root comments. Every action is initiated interactively by the user. The initial version performs no voting, posting, replying, messaging, moderation, or automated account activity.
 
 The app has no ads, payments, analytics, data resale, AI training, scraping, or server-side collection. OAuth runs through ASWebAuthenticationSession, tokens remain in the iOS Keychain, passwords are never collected, local caching is limited, deleted content is removed, and Reddit's rate-limit headers are respected. The current build is a working fixture-data prototype; live Data API access remains disabled until Reddit approves this request and issues an installed-app client ID.
 
@@ -158,27 +158,15 @@ REDDIT_CLIENT_ID = YOUR_INSTALLED_APP_CLIENT_ID
 REDDIT_DEVELOPER_USERNAME = giddiness-uneasy
 ```
 
-Regenerate and build:
+Regenerate the Xcode project:
 
 ```sh
 xcodegen generate
-./scripts/build-sidestore-ipa.sh
 ```
 
-The build script produces the canonical IPA at:
-
-```text
-/Users/asdf/repos/reantenna/build/ReAntenna-unsigned.ipa
-```
-
-It also copies a versioned IPA to:
-
-```text
-/Users/asdf/Downloads/
-```
-
-Install the new version over the existing ReAntenna app through SideStore. Do not
-delete the old installation first if its local data should survive.
+Build and install the updated application using the personal-device workflow in
+`docs/PROJECT_HANDOFF.md`. Keep the bundle identifier unchanged and install over
+the existing app so local data can survive.
 
 ## 6. Validate the approved connection
 
