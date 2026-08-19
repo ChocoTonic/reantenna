@@ -55,20 +55,28 @@ The form verified on 2026-08-19 contains these fields in this order:
 | What is your inquiry?                                            | **I’m a developer and want to build a Reddit App that does not work in the Devvit ecosystem.** |
 | Reddit account name                                              | `giddiness-uneasy`                                                                             |
 
-Reddit displays **What benefit/purpose will the bot/app have for Redditors?** followed by **Provide a detailed description of what the Bot/App will be doing on the Reddit platform** and a request for examples. These instructions apply to the same response box. Paste this answer, which addresses each part explicitly:
+For **What benefit/purpose will the bot/app have for Redditors?**, paste:
 
 ```text
-Benefit/purpose: ReAntenna gives Redditors a compact, accessible native iOS reading interface with fast gesture navigation, dense feeds, root-comment navigation, and the ability to collapse all child comments while keeping root comments visible. It is a personal, noncommercial, independently written app inspired by the discontinued Antenna/AMRC interaction model and is not affiliated with Reddit or the original developer.
+ReAntenna gives Redditors a compact, accessible native iOS reading interface with fast gesture navigation, dense feeds, root-comment navigation, and the ability to collapse all child comments while keeping root comments visible. It is a personal, noncommercial, independently written app inspired by the discontinued Antenna/AMRC interaction model and is not affiliated with Reddit or the original developer.
+```
 
-Detailed behavior: The initial version is for one personal iPhone installed through SideStore. After the user explicitly signs in with Reddit OAuth, the app requests only identity, read, and subscribed-subreddit access. It retrieves the user's home feed, selected subreddit listings, posts, post text, comment trees, and subreddit subscriptions. The user can sort and browse feeds, open a post, read its comments, collapse individual branches or every child branch, and move between root comments. Every action is initiated interactively by the user. The initial version performs no voting, posting, replying, messaging, moderation, or automated account activity.
+For **Provide a detailed description of what the Bot/App will be doing on the Reddit platform.**, paste:
 
-Examples: A user can open their home feed, switch to a subscribed or manually selected subreddit, open a discussion, choose a comment sort, collapse all replies beneath the root comments, and move directly to the next root comment. The app does not collect subreddits in bulk or act without the user.
+```text
+The initial version is for one personal iPhone installed through SideStore. After the user explicitly signs in with Reddit OAuth, ReAntenna requests only identity, read, and subscribed-subreddit access. It retrieves the user's home feed, selected subreddit listings, posts, post text, comment trees, and subreddit subscriptions. The user can sort and browse feeds, open a post, read its comments, collapse individual branches or every child branch, and move between root comments. Every action is initiated interactively by the user. The initial version performs no voting, posting, replying, messaging, moderation, or automated account activity.
 
-Data handling: The app has no ads, payments, analytics, data resale, AI training, scraping, or server-side collection. OAuth runs through ASWebAuthenticationSession, tokens remain in the iOS Keychain, passwords are never collected, local caching is limited, deleted content is removed, and Reddit's rate-limit headers are respected. The current build is a working fixture-data prototype; live Data API access remains disabled until Reddit approves this request and issues an installed-app client ID.
+The app has no ads, payments, analytics, data resale, AI training, scraping, or server-side collection. OAuth runs through ASWebAuthenticationSession, tokens remain in the iOS Keychain, passwords are never collected, local caching is limited, deleted content is removed, and Reddit's rate-limit headers are respected. The current build is a working fixture-data prototype; live Data API access remains disabled until Reddit approves this request and issues an installed-app client ID.
 
 OAuth redirect URI: reantenna://oauth
 Bundle identifier: com.chocotonic.reantenna
 User-Agent: ios:com.chocotonic.reantenna:v0.2.0 (by /u/giddiness-uneasy)
+```
+
+For **Provide examples, the more detailed this description the more likely we will be able to assess your request.**, paste:
+
+```text
+A user can open their home feed, switch to a subscribed or manually selected subreddit, open a discussion, choose a comment sort, collapse all replies beneath the root comments, and move directly to the next root comment. The app does not collect subreddits in bulk, run unattended, or take actions without the user.
 ```
 
 For **What is missing from Devvit that prevents building on that platform?**, paste:
